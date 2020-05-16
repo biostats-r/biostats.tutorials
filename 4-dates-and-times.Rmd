@@ -79,7 +79,9 @@ See `?strptime` for the complete list.
 
 ### Your turn
 
-Use the `as.Date` (for the date) and `as.POSIXct` (for the datetime) to convert the following to date or datetime format.
+Use the `as.Date` (for the date) and `as.POSIXct` (for the datetime) to convert the following to dates or datetimes. 
+You will need to use the `format` argument to each function and read the `strptime` help.
+If you get an `NA`, the format arguement is not correct.
 
 
 ```{r base-dates, exercise = TRUE}
@@ -120,6 +122,13 @@ dmy_hms("26-10-16 14.39.10")
 dmy_hms("26th Oct 2016 14 39 10")
 dmy_hms("261016143910")
 ```
+
+`lubridate` can even cope when the format is mixed, provided the elements are in the same order.
+
+```{r lubridate-dmy_hms}
+dmy_hms(c("26-10-16 14.39.10", "26th Oct 2016 14 39 10", "261016143910"))
+```
+
 
 
 ### Different formats
