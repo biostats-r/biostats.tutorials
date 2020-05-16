@@ -28,6 +28,15 @@ temperature2 <- temperature %>%
     ) 
 ```
 
+## Date and times
+
+In this tutorial, you will learn how to
+
+- make date and times in R
+- manipulate dates and times
+- use dates and times in data.frames with `dplyr`
+- plot dates and times with `ggplot2`
+
 ## Date and time formats
 
 Converting strings to dates is tricky.
