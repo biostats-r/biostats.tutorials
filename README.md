@@ -1,6 +1,11 @@
 # Data handling with tidyverse
 
-This project includes the following tutorials.
+Importing and cleaning data usually take up the vast majority of time spent working on a project. The statistical analysis is often fairly quick and done in a few lines of code. 
+To make an analysis reproducible, we need to do all the data processing with code (rather than editing files in Excel).
+
+This project is designed to help you process your raw data entirely with R so that it is ready for plotting and statistical analysis. 
+
+It contains the following tutorials
 
 - 4-dates-and-times.Rmd
 
