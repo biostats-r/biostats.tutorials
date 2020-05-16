@@ -1,5 +1,6 @@
 ---
 title: "Working with dates and times"
+author: Richard. J. Telford
 output: 
   learnr::tutorial:
     progressive: true
@@ -125,7 +126,7 @@ dmy_hms("261016143910")
 
 `lubridate` can even cope when the format is mixed, provided the elements are in the same order.
 
-```{r lubridate-dmy_hms}
+```{r lubridate-dmy_hms-mixed}
 dmy_hms(c("26-10-16 14.39.10", "26th Oct 2016 14 39 10", "261016143910"))
 ```
 
