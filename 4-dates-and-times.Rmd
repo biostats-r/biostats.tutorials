@@ -32,7 +32,7 @@ temperature2 <- temperature %>%
 
 In this tutorial, you will learn how to
 
-- make date and times in R
+- make dates and times in R
 - manipulate dates and times
 - use dates and times in data.frames with `dplyr`
 - plot dates and times with `ggplot2`
@@ -124,7 +124,7 @@ dmy_hms("261016143910")
 
 ### Different formats
 
-There are a load of other functions in the `lubridate` package for coping with dates with elements in different orders.
+There are many other functions in the `lubridate` package for coping with dates with elements in different orders.
 
 For example
 
@@ -134,7 +134,7 @@ ydm_hms("2016 26th Oct 14 39 10") # year first then day
 mdy_hms("Oct 26th 2016 14 39 10") # month first (US standard)
 ```
 
-Look at the help file for more function and arguments.
+Look at the help file for more functions and arguments.
 
 If you have an invalid format or an impossible date, you will get a warning.
 
@@ -166,7 +166,7 @@ mdy_hm(date2)
 ### Time zones
 
 The default timezone for the `lubridate` functions is UTC (approximately Greenwich Mean Time).
-This is normally fine unless you are dealing with local times in multiple timezones, or because the you need to allow for daylight saving time.
+This is normally fine unless you are dealing with local times in multiple time-zones, or because you need to allow for daylight saving time.
 
 ```{r timezone}
 mdy_hm("July 1 2001 2:14", tz = "Europe/Oslo")
@@ -229,7 +229,7 @@ hour(now())
 
 ## Languages
 
-R uses locales to know what language to expect the date to the written in. 
+R uses locales to know what language to expect the date to be written in. 
 See `?locales`. 
 Locales are a bit of a pain.
 
@@ -263,7 +263,7 @@ Sys.setlocale("LC_TIME", "en_DK.utf8")
 ```
 
 
-## Dates and `dyplr`
+## Dates and `dplyr`
 
 As an ecologist, I spend a lot of time processing climate data  for comparison with ecological data.
 The data are typically in R in a data.frame, so `dplyr` is useful for manipulating them.
@@ -305,7 +305,7 @@ tibble(year = 2020, month = 10, day = 3) %>%
 
 I often need to `filter` data to remove bad data or restrict the dates and times in the dataset.
 
-For example, calculate the mean temperature of the afternoon of the 21st April, we first need to `filter` the data. 
+For example, to calculate the mean temperature of the afternoon of the 21st April, we first need to `filter` the data. 
 `between` is a useful helper function here to avoid having to write a more complicated logical condition.
 
 ```{r filter-temperature}
@@ -332,7 +332,7 @@ temperature2 %>%
 ```
 
 
-### Using `group_by` and `sumararise`
+### Using `group_by` and `summarise`
 
 I often want to summarise climate data to calculate mean monthly temperatures. 
 We can do an analogous task with the `temperature` dataset to calculate mean hourly temperatures.
