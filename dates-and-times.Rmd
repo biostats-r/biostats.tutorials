@@ -28,7 +28,7 @@ Converting strings to dates is tricky.
 
 Many formats
  
-- 5th December 2020
+- Saturday 5th December 2020
 - 12-5-2020
 - 5.12.20
 - 5 Dec 20
@@ -157,12 +157,21 @@ yday(today())# day of year
 
 ## Languages
 
-R uses locales to know what language to expect the date to the written in. See `?locales`
+R uses locales to know what language to expect the date to the written in. See `?locales`. Locales are a bit of a pain.
+
+You can find your current locale with 
+
+```{r get-locale}
+Sys.getlocale(category = "LC_TIME")
+```
+
+Unfortunately, the locales available depend on your operating system.
 
 You can change the locale to Bokmål for the whole session with 
 
 ```{r date-locales}
-Sys.setlocale("LC_TIME", "nb_NO.utf8")
+Sys.setlocale(category = "LC_TIME", locale = "nb_NO.utf8") #on linux/Mac, "nn_NO.utf8" for nynorsk
+#Sys.setlocale(category = "LC_TIME", locale = "Norwegian Bokmål_Norway.1252") # should work on windows
 dmy("1 januar 2020")
 ```
 
@@ -171,13 +180,13 @@ Or use the `locale` argument of `dmy`.
 To see the available locales on your computer, run 
 
 ```{r available-locales, eval = FALSE}
-system("locale -a", intern = TRUE)
+system("locale -a", intern = TRUE) #on linux/Mac
 ```
+On Windows, you need to go to the Region setting in the Control Panel.
 
 ```{r date-locale-revert, echo = FALSE, include = FALSE}
 Sys.setlocale("LC_TIME", "en_DK.utf8")
 ```
-
 
 
 ## Dates and `dyplr`
@@ -206,6 +215,14 @@ temperature <- temperature %>%
 
 temperature
 ```
+
+`lubridate` functions `make_date` and `make_datetime` are useful if the year, month, day etc are in different columns.
+
+```{r make-date}
+tibble(year = 2020, month = 10, day = 3) %>% 
+  mutate(date = make_date(year = year, month = month, day = day))
+```
+
 
 ### Using `filter` to select rows
 
@@ -252,16 +269,25 @@ ggplot(temperature, aes(x = date_time, y = Lufttemperatur)) +
 ```
 
 `ggplot` recognises that the x-axis variable is a date-time and plots the axis with appropriate labels. 
-The language will depend on the locale (see `Sys.getlocale()`)
+The language will depend on the locale (see `Sys.getlocale()`).
 
+
+We can also plot times. 
 
 ```{r}
 ggplot(temperature, aes(x = Tid, y = Lufttemperatur, group = Dato)) + 
   geom_line()
 ```
 
+Here the aesthetic `group = Dato` make `ggplot` draw a different line for each day.
+
+I don't think the breaks in this plot were chosen very well so I can use `scale_x_time` to set the breaks and the format for the times (this is where the codes listed in `?strptime` become useful)
+
 ```{r}
 ggplot(temperature, aes(x = Tid, y = Lufttemperatur, group = Dato)) + 
   geom_line() + 
   scale_x_time(breaks = seq(0, 24, 6) * 3600, labels = scales::time_format("%H:%M"))
 ```
+
+
+With dates, use `scale_x_date` 
