@@ -7,7 +7,9 @@ This project is designed to help you process your raw data entirely with R so th
 
 It contains the following tutorials
 
+- 1-loading-data.Rmd
 - 4-dates-and-times.Rmd
+- 5-text-manipulation.Rmd
 
 To run a tutorial, open the file in RStudio and click the `Run Document` button that appears above the text.
 It will take a few moments to compile the tutorial, then it should open in a new window.

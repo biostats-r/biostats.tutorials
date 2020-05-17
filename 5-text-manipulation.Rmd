@@ -1,5 +1,6 @@
 ---
 title: "Processing text with `stringr`"
+author: Richard J. Telford
 output: 
   learnr::tutorial:
     progressive: true
