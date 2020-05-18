@@ -1,0 +1,514 @@
+---
+title: "Manipulating data frames"
+author: Richard J. Telford
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, rows.print = 3)
+library("learnr")
+library("tidyverse")
+theme_set(theme_classic())
+
+tutorial_options(exercise.cap = "Exercise")
+```
+
+```{r check-dplyr version, echo = FALSE}
+tested <- "0.8.99.9003"
+if(packageVersion("dplyr") < tested){
+  print(glue::glue("This tutorial was designed to work with dplyr version >= 1.0 (or the development version {tested}). \nYou have dplyr version {packageVersion(\"dplyr\")}.\nParts of the tutorial may give errors unless you update dplyr.\ndplyr version 1.0 should be released on CRAN at the end of May 2020.\nYou can install the development version now with remotes::install_github('tidyverse/dplyr')"))
+
+  #continue knitting after errors
+  knitr::opts_chunk$set(error = TRUE)
+  
+}
+
+```
+# Intro
+
+## Data frame manipulation with `dplyr`
+
+Data frames are usually the most convenient objects for storing, plotting or analysing data in R. 
+We also need to be able to manipulate data in data frames.
+
+This tutorial will show you how to manipulate data frames using the `dplyr` package, part of the `tidyverse`.
+
+Everything that can be done with `dplyr` can be done with base R. 
+The `dplyr` solution is usually easier to write and understand, and can be faster.
+
+There are many function in `dplyr`, this tutorial focuses on the functions I find most useful.
+
+This tutorial is designed for the new `dplyr` version >= 1.0.0. 
+
+
+### Load the package
+
+```{r load-packages, include = FALSE}
+library("tidyverse")
+library("conflicted") # prevent conflict errors
+conflict_prefer("select", winner = "dplyr")
+conflict_prefer("select", winner = "dplyr")
+```
+
+
+### More feedback `tidylog`
+
+We can get more feedback on what `dplyr` functions have done to the data by loading the `tidylog` package.
+
+```{r tidylog, include = FALSE}
+library("tidylog")
+#use map from purrr to iterate over tidylog functions to prevent conflict with dplyr
+map(getNamespaceExports("tidylog"), ~conflict_prefer(.x, "tidylog", quiet = TRUE))
+```
+
+More than once, `tidylog` has helped identified bugs in my code.
+
+## The iris dataset
+
+This tutorial will use the built-in [iris](https://en.wikipedia.org/wiki/Iris_flower_data_set) dataset.
+This dataset includes floral dimensions from three species of iris.
+
+```{r iris}
+iris
+```
+
+
+# One table functions
+
+## Selecting columns with `select`
+
+You can choose which columns of the data frame you want with `select()`.
+
+The first argument is the data, which is supplied by the pipe `%>%`, the next arguments are the names of the columns you want. 
+The names do not need quote marks.
+
+```{r select1}
+#select Sepal.Length, Sepal.Width, Species
+iris %>% select(Sepal.Length, Sepal.Width, Species)
+```
+
+
+This is equivalent to the base R code
+
+```{r select1.5}
+#select Sepal.Length, Sepal.Width, Species
+iris[, c("Sepal.Length", "Sepal.Width", "Species")]
+```
+
+
+### `select` helpers  
+
+Sometimes we don't want to write out the names of all the columns we want to select.
+We might not even know them all in advance. 
+Fortunately there are some helper functions.
+
+If you want to `select` adjacent columns, you can use the notation `first:last`.
+
+```{r select2}
+#select Sepal.Length to Petal.Width
+iris %>% select(Sepal.Length:Petal.Width)
+```
+
+Sometimes it is easier to remove the columns you don't want. 
+You can do this by putting a `-` in front of the column name.
+
+```{r select3}
+#select Sepal.Length, Sepal.Width, Species
+iris %>% select(-Petal.Length, -Petal.Width)
+```
+
+If there is a pattern to the column names that we want to select (or remove), there are some helper functions.
+For example, to select columns that start with "Sepal", we can use the function `starts_with`.
+
+```{r select4}
+#select Sepal.Length, Sepal.Width, Species
+iris %>% select(starts_with("Sepal"))
+```
+
+Conversely, if we want to select all columns that end with "Width", we can use the function `ends_with()`.
+`contains()` is more flexible and `matches()` is the most powerful of the helper functions, using regular expressions to identify the columns.
+
+Sometimes, you might want to select all the columns of a certain type. 
+For example, to select all the numeric columns we can use the `is.numeric` function inside select.
+
+```{r select5}
+iris %>% select(where(is.numeric)) # No brackets on the function
+```
+
+Other `is.*` functions exist, for example, `is.character` for text, `lubridate::is.Date` for dates.
+
+You can also select columns by number (1 being the first column), but this is generally a bad idea because if a new column is added, or the column order is changed, the code will break.
+
+### Your turn
+
+Find at least three different ways to select the Sepal.Width and Petal.Width columns from iris
+
+```{r select-ex, exercise = TRUE}
+iris %>% select()
+iris %>% select()
+iris %>% select()
+
+```
+
+
+```{r select-ex-solution}
+
+#direct
+iris %>% select(Sepal.Width, Petal.Width)
+
+#negative
+iris %>% select(-Sepal.Length, -Petal.Length, -Species)
+
+#ends with
+iris %>% select(ends_with("Width"))
+
+#matches regular expression
+iris %>% select(matches("Width$"))
+```
+
+Which of these strategies works best is context dependent.
+
+## Renaming columns with `rename`
+
+You can use `rename()` to rename columns
+
+```{r rename1}
+iris %>% rename(spp = Species)
+```
+
+The syntax is `new_name = current_name`.
+
+You can also rename a column when selecting.
+This is convenient 
+
+```{r rename2}
+iris %>% select(spp = Species)
+```
+
+
+## Moving columns with `relocate`
+
+Sometimes it is useful to reorder the columns. 
+This is never necessary for data analysis or plotting, but can be needed when making a table for presentation.
+
+```{r relocate}
+iris %>% relocate(Species)
+```
+
+The default is to move the named column first, the `.before` and `.after` arguments let you move the column into any position. 
+
+## Filtering rows with `filter`
+
+Filtering rows that meet some condition is a very common task.
+
+For example, to filter rows that have a sepal length greater than 6, we can use 
+
+```{r filter1}
+iris %>% filter(Sepal.Length > 6)
+```
+
+This will filter out each row where the condition is TRUE.
+
+The base R equivalent of this is 
+
+```{r filter_base}
+iris[iris$Sepal.Length > 6, ]
+```
+
+Generally, `filter` makes it easier to understand, especially with more complex criteria.
+
+
+Other tests include 
+
+- `==` exactly equals. Often a bad idea to use with numeric data 
+- `near` safe function for testing equality of numeric data as it has a tolerance of rounding errors
+
+```{r filter-near}
+sqrt(2) ^ 2 == 2 # should be true, but rounding errors 
+sqrt(2) ^ 2 - 2 # the difference
+near(sqrt(2) ^ 2, 2) # safe alternative
+```
+
+- `!=` not equal to
+- `<` less than
+- `<=` less than or equal to
+- `>` greater than
+- `>=` greater than or equal to
+- `is.na()` for filtering by missing values.
+- `between()` for filtering values with a range
+- `%in%` is used when you want to test if a value is in a vector
+
+```{r filter-in}
+iris %>% filter(Species %in% c("setosa", "versicolor"))
+#equivalent to 
+iris %>% filter(Species == "setosa" | Species == "versicolor")
+```
+
+### Filtering on multiple criteria
+
+If we want to filter on multiple criteria, we need to decide whether we want all criteria to be TRUE (AND in Boolean logic), or for one or more to be TRUE (OR in Boolean logic).
+
+If we want all criteria to be TRUE, we can separate them by a comma (or by an `&` if you want to be explicit).
+
+```{r filter-AND}
+iris %>% filter(Sepal.Length > 6, Petal.Length > 6)
+```
+
+If we want any criteria to be TRUE, we can separate them by a `|`.
+
+```{r filter-OR}
+iris %>% filter(Sepal.Length > 6 | Petal.Length > 6)
+```
+
+We can negate a criterion by putting `!` in front of it.
+So to filter rows that do not have sepals longer than 6 we can use
+
+```{r filter-NOT}
+iris %>% filter(!Sepal.Length > 6)
+```
+
+Of course, in this example, we could also use `<=` as the test.
+
+
+### Your turn
+
+Filter the iris dataset so that it only has the species versicolor.
+
+```{r filter-ex, exercise = TRUE}
+iris %>% filter()
+```
+
+```{r filter-ex-solution, exercise = TRUE}
+iris %>% filter(species == "versicolor")
+```
+
+Filter the iris dataset so that it only has Petal.Length between 6 and 7 cm.
+
+```{r filter-ex2, exercise = TRUE}
+iris %>% filter()
+```
+
+```{r filter-ex2-solution, exercise = TRUE}
+iris %>% filter(between(Petal.Length, left = 6, right = 7))
+```
+
+
+### Common errors
+
+The commonest error is to use a single `=` rather than `==`.
+Only the latter is a test of equality.
+If you do this, the error message is quite helpful.
+
+```{r filter-error, error=TRUE}
+iris %>% filter(species = "versicolor")
+```
+
+Another common error is to forget to quote any strings.
+
+```{r filter-error2, error=TRUE}
+iris %>% filter(species == versicolor)
+```
+
+
+
+## Slicing the data with `slice`
+
+Sometimes it is useful to extract rows by row number. 
+
+```{r slice}
+iris %>% slice(3:7)
+```
+
+You can use negative numbers to remove rows. 
+Be careful using `slice()` as if the data change, different rows may be returned. 
+
+
+## Distinct rows with `distinct`
+
+If there are duplicates in the data, we can remove these with `distinct()`.
+`distinct()` with no extra arguments will remove duplicate rows. 
+
+```{r}
+iris %>% distinct()
+```
+
+If we are only interested in some of the columns, we can supply the names of these columns.
+
+```{r}
+iris %>% distinct(Species)
+```
+
+Other columns will be removed unless the argument `.keep_all = TRUE` is used.
+
+## Random rows
+
+Sometimes you want to sample rows at random from a data.frame. 
+Two useful functions for this are `sample_n` and `sample_frac`. 
+The first samples a constant _n_ rows, the second samples a constant fraction of the rows.
+
+```{r sample-n}
+iris %>% sample_n(size = 10)
+```
+
+
+## Mutating and adding columns with `mutate`
+
+The function `mutate()` can add an new column or replace an existing one.
+
+To make a new column called `sepal_area` we can use
+
+```{r}
+iris %>% mutate(sepal_area = Sepal.Length * Sepal.Width)
+```
+
+There are lots of functions that are useful to use with mutate. 
+Any function that returns either a single value or as many values as are in the data can be used.
+
+`mutate()` is very useful when cleaning data.
+
+- See text manipulation tutorial for cleaning text with the `stringr` package.
+- See date and time tutorial for cleaning dates and times with the `lubridate` package.
+
+
+### Your turn
+
+Create a column with the mean Sepal Length.
+Then filter the dataset to keep just the rows with a Sepal Length greater than the mean Sepal Length
+
+```{r mutate-ex, exercise = TRUE}
+iris %>% 
+  mutate()
+```
+```{r mutate-ex-solution}
+iris %>% 
+  mutate(sep_len_mean = mean(Sepal.Length)) %>%
+  filter(Sepal.Length > sep_len_mean)
+
+#Also possible in one step
+iris %>%
+  filter(Sepal.Length > mean(Sepal.Length))
+
+```
+
+
+
+## Summarising data with `summarise`
+
+`summarise` lets us summarise data.
+
+```{r summarise1}
+iris %>% summarise(sepal_len_mean = mean(Sepal.Length), sepal_len_sd = sd(Sepal.Length))
+```
+
+Only the columns created in the `summarise` and any grouping columns (see below) will be kept.
+
+## Grouping data with `group_by`
+
+`group_by()` changes the way that many of the other `dplyr` functions work.
+Instead of working on the entire dataset, they now work on each group in the data
+
+To find the mean sepal length for each species, we need to `group_by` species and then `summarise`.
+
+```{r group-by}
+iris %>% 
+  group_by(Species) %>% 
+  summarise(mean_sepal_length = mean(Sepal.Length))
+```
+
+
+Grouped data can be ungrouped with `ungroup()`.
+This can help prevent surprises!
+
+
+### Your turn
+
+Modify your code from the `mutate` task to filter rows where the sepal length is greater than the mean of the relevant species.
+
+```{r group_by-ex, exercise = TRUE}
+iris %>% 
+```
+```{r group_by-solution}
+iris %>% 
+  group_by() %>%
+  mutate(sep_len_mean = mean(Sepal.Length)) %>%
+  filter(Sepal.Length > sep_len_mean)
+
+#Also possible in one step
+iris %>%
+  group_by(Species) %>%
+  filter(Sepal.Length > mean(Sepal.Length))
+```
+
+
+## Sorting with `arrange`
+
+To sort the data frame by one or more of the variables we can use `arrange`.
+
+```{r arrange1}
+iris %>% arrange(Sepal.Length, Petal.Length)
+```
+
+This will sort smallest first. 
+To reverse the sort order, use `desc()`
+
+```{r arrange2}
+iris %>% arrange(desc(Sepal.Length), desc(Petal.Length))
+```
+
+ 
+## Counting rows with `count` and `n`
+
+The function `n` can count how many rows there are in the each group (or, less usefully, the entire data frame if it is not grouped).
+It can be used with either `mutate` or `summarise`.
+
+```{r n}
+iris %>% group_by(Species) %>% summarise(n = n())
+```
+
+`count` roughly equivalent to this
+
+```{r count}
+iris %>% count(Species)
+```
+
+
+
+
+
+# multi-table
+
+## Joins
+left_join inner_join full_join (right_join) ((semi_join anti_join))
+bind_cols bind_rows 
+
+## General problems
+
+
+
+### Non standard names
+
+Ideally column names should follow the standard rules for naming objects in R - UPPER and lower case letters, numbers, "." and "_" with the first character being a letter (or a dot if you want an invisible object).
+Sometimes when you import data, it has non-standard names with spaces or extra characters.
+If you need to refer to a column name that doesn't follow the rules, you need to enclose it with back-ticks.
+```{r non-standard-names}
+df <- tibble(`Region/Country` = "Norway", value = 42)
+df
+df %>% rename(region_country = `Region/Country`)
+```
+It is sometimes best to rename these columns to make them easier to refer to. 
+The `janitor` package can help if there are many columns to rename.
+
+## advanced ??
+nest unnest
+map
+
+## Resources
+
+[stat545](https://stat545.com/dplyr-intro.html)
+[R for data science](https://r4ds.had.co.nz/) (Online copy of book)
+[`dplyr` cheatsheet](https://rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf)
+

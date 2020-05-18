@@ -8,6 +8,7 @@ This project is designed to help you process your raw data entirely with R so th
 It contains the following tutorials
 
 - 1-loading-data.Rmd
+- 3-data-manipulation-with-dplyr.Rmd
 - 4-dates-and-times.Rmd
 - 5-text-manipulation.Rmd
 
