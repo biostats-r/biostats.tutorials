@@ -181,7 +181,7 @@ iris %>% rename(spp = Species)
 The syntax is `new_name = current_name`.
 
 You can also rename a column when selecting.
-This is convenient 
+This is convenient if you are using `select` anyway.
 
 ```{r rename2}
 iris %>% select(spp = Species)
@@ -284,7 +284,7 @@ iris %>% filter()
 iris %>% filter(species == "versicolor")
 ```
 
-Filter the iris dataset so that it only has Petal.Length between 6 and 7 cm.
+Filter the iris dataset so that it only has petal length between 6 and 7 cm.
 
 ```{r filter-ex2, exercise = TRUE}
 iris %>% filter()
@@ -357,10 +357,10 @@ iris %>% sample_n(size = 10)
 
 The function `mutate()` can add an new column or replace an existing one.
 
-To make a new column called `sepal_area` we can use
+To make a new column called `sepal_ratio` we can use
 
 ```{r}
-iris %>% mutate(sepal_area = Sepal.Length * Sepal.Width)
+iris %>% mutate(sepal_ratio = Sepal.Length / Sepal.Width)
 ```
 
 There are lots of functions that are useful to use with mutate. 
@@ -374,8 +374,8 @@ Any function that returns either a single value or as many values as are in the 
 
 ### Your turn
 
-Create a column with the mean Sepal Length.
-Then filter the dataset to keep just the rows with a Sepal Length greater than the mean Sepal Length
+Create a column with the mean sepal length.
+Then filter the dataset to keep just the rows with a sepal length greater than the mean sepal length
 
 ```{r mutate-ex, exercise = TRUE}
 iris %>% 
@@ -403,6 +403,24 @@ iris %>% summarise(sepal_len_mean = mean(Sepal.Length), sepal_len_sd = sd(Sepal.
 ```
 
 Only the columns created in the `summarise` and any grouping columns (see below) will be kept.
+
+### Summarising multiple columns
+
+Sometimes you want to summarise multiple columns at the same time.
+This can be done with the `across` helper function. 
+`across` needs to be told which columns to process and what function or functions to use.
+
+```{r across}
+iris %>%
+   summarise(across(c(Petal.Length, Petal.Width),  .fns = mean))
+
+
+iris %>%
+  summarise(across(.cols = starts_with("Sepal"), .fns = list(sd = sd,mean = mean)))
+```
+
+You can also use `across` with `mutate`.
+
 
 ## Grouping data with `group_by`
 
@@ -474,7 +492,7 @@ iris %>% count(Species)
 ```
 
 
-# Merging data frames with joins
+## Merging data frames with joins
 
 All the `dplyr` functions we have looked at so far work on a single data frame.
 Joins work on two data frames, combining them according to a common variable.
