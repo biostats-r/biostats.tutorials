@@ -28,7 +28,7 @@ if(packageVersion("dplyr") < tested){
 }
 
 ```
-# Intro
+
 
 ## Data frame manipulation with `dplyr`
 
@@ -76,8 +76,6 @@ This dataset includes floral dimensions from three species of iris.
 iris
 ```
 
-
-# One table functions
 
 ## Selecting columns with `select`
 
@@ -476,18 +474,85 @@ iris %>% count(Species)
 ```
 
 
+# Merging data frames with joins
+
+All the `dplyr` functions we have looked at so far work on a single data frame.
+Joins work on two data frames, combining them according to a common variable.
+
+For example, the `iris_height` data frame has the height of three iris species.
+
+```{r iris-height}
+iris_height <- tribble(
+  ~ Species, ~ height, # tribble is a convenient way to make small datasets
+  "verna", 15,
+  "versicolor", 80,
+  "virginica",  90)
+
+iris_height
+```
+
+We can use a join to merge these data with the original iris data. 
+The `by` argument tells the join which column to make the join by.
+Here, we are joining by a single column with the same name in both data frames.
+It is possible to join by multiple columns and where the columns have different names in each dataset.
+
+```{r iris-leftjoin}
+iris2 <- iris %>% group_by(Species) %>% slice(1:2) # small version of data for easy viewing
+
+iris2 %>% left_join(iris_height, by = "Species")
+```
+
+Only two of taxa in the original dataset are in the `iris_height` data set. 
+Different variants of join will treat this in different ways.
+
+- `left_join` will take all rows from the first (left) data frame and matching rows from the second (right). 
+- `right_join` does the opposite to `left_join`.
+- `inner_join` will take only rows that match in both data frames.
+- `full_join` will take all rows from in both data frames.
+
+In all cases, missing values will are given an `NA`.
+
+## Binding data frames together
+
+If we have two or more data frames that we want to combine.
+
+### More columns - `bind_cols`
+
+If the data frames contain information about the same observations, they can be combined with `bind_cols`.
+
+So data1, data2, and data3 can be combined to make one data frame with many columns
+```{r bind-cols, eval = FALSE}
+bind_cols(data1, data2, data3)
+```
+
+Note that `bind_cols` expects that the row order is the same in both datasets, but cannot check this. 
+It only checks that the number of rows is the same in each data frame.
+If possible, use a join instead.
+
+
+### More rows - `bind_rows`
+
+If the data frame contain more obserations (rows), and typically at least some of the same columns, they can be combined with `bind_rows`.
+This is useful if, for example, there are data from two years that need combining.
+
+One feature of `bind_cols` that I find useful is the `.id` argument that makes an extra column for the 
+
+```{r bind-rows, eval = TRUE}
+iris_height <-  tribble( ~ Species, ~ height,
+                         "versicolor", 80,
+                         "virginica",  90)
+
+pyrola_height <- tribble( ~ Species, ~ height,
+                          "minor", 15,
+                          "media", 30)
+
+bind_rows(Iris = iris_height, pyrola = pyrola_height, .id = "Genus")
+```
 
 
 
-# multi-table
 
-## Joins
-left_join inner_join full_join (right_join) ((semi_join anti_join))
-bind_cols bind_rows 
-
-## General problems
-
-
+## Common problems
 
 ### Non standard names
 
