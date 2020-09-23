@@ -34,7 +34,7 @@ We might want to detect which strings have a particular pattern, or replace, rem
 We can do this with the `stringr` package which is loaded when `tidyverse` is loaded.
 
 ```{r eval = FALSE}
-library("tidyverse")# load stringr, ggplot, dplyr etc
+library("tidyverse")# load stringr, ggplot2, dplyr etc
 ```
 
 This tutorial starts with detecting or replacing fixed patterns and then shows how you can use regular expressions to extract varying patterns.
@@ -43,7 +43,7 @@ This tutorial starts with detecting or replacing fixed patterns and then shows h
 
 ### Using `str_detect`
 
-We might want to detect which of the species are in the genus _Navicula_. We can do this with `str_detect` (the base R equivalent is `grepl`.
+We might want to detect which of the species are in the genus _Navicula_. We can do this with `str_detect` (the base R equivalent is `grepl`).
 
 ```{r detect}
 str_detect(string = diatoms, pattern = "Navicula")
@@ -149,8 +149,8 @@ We can control how many times something gets matched by following it with a quan
 - `+`: One or more times
 - `*`: Any number of times 
 - `{2}`: Exactly twice 
-- `{2, 4}`: Between two and four times
-- `{, 4}`: At most four times
+- `{2,4}`: Between two and four times
+- `{,4}`: At most four times
 - `{2,}`: At least twice
 
 So to match either "palaeoecology" or "paleoecology", we can follow the "a" with a "?".
@@ -320,7 +320,7 @@ str_extract(filename, pattern = "\\d{4}")
 It is usually possible to use either of these methods.
 Here, `str_extract` is easier. 
 If there were multiple numeric sequences and we wanted a specific one, then capture groups might be easier.
-One important difference is that if the match fails, `str_extract` will return `NA`, wereas `str_replace` will return the original string.
+One important difference is that if the match fails, `str_extract` will return `NA`, whereas `str_replace` will return the original string.
 
 ### Your turn
 
@@ -333,6 +333,9 @@ filenames <- c("c:/pond_2020.xls", "d:/data/marsh_2018.xls")
 ```
 ```{r extract-ex-solution}
 str_replace(filenames, pattern = ".*/(\\w*)_\\d{4}\\.xls$", replacement = "\\1")
+#or extract word followed by an "_", then remove "_"
+str_extract(filenames, pattern = "\\w*_") %>% 
+  str_remove(pattern = "_")
 ```
 
 
