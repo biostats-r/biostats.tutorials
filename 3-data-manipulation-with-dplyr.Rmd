@@ -9,26 +9,19 @@ runtime: shiny_prerendered
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, rows.print = 3)
+if(packageVersion("dplyr") < "1.0.0"){
+  print(glue::glue("This tutorial was designed to work with dplyr version >= 1.0. \nYou have dplyr version {packageVersion(\"dplyr\")}.\nParts of the tutorial will give errors unless you update dplyr."))
+
+#continue knitting after errors
+knitr::opts_chunk$set(echo = TRUE, rows.print = 3, error = TRUE)
+
+#packages
 library("learnr")
 library("tidyverse")
 theme_set(theme_classic())
 
 tutorial_options(exercise.cap = "Exercise")
 ```
-
-```{r check-dplyr version, echo = FALSE}
-tested <- "0.8.99.9003"
-if(packageVersion("dplyr") < tested){
-  print(glue::glue("This tutorial was designed to work with dplyr version >= 1.0 (or the development version {tested}). \nYou have dplyr version {packageVersion(\"dplyr\")}.\nParts of the tutorial may give errors unless you update dplyr.\ndplyr version 1.0 should be released on CRAN at the end of May 2020.\nYou can install the development version now with remotes::install_github('tidyverse/dplyr')"))
-
-  #continue knitting after errors
-  knitr::opts_chunk$set(error = TRUE)
-  
-}
-
-```
-
 
 ## Data frame manipulation with `dplyr`
 
