@@ -10,7 +10,12 @@ runtime: shiny_prerendered
 
 ```{r setup, include=FALSE}
 if(packageVersion("dplyr") < "1.0.0"){
-  print(glue::glue("This tutorial was designed to work with dplyr version >= 1.0. \nYou have dplyr version {packageVersion(\"dplyr\")}.\nParts of the tutorial will give errors unless you update dplyr."))
+  print(glue::glue(
+    "This tutorial was designed to work with dplyr version >= 1.0.0. 
+     You have dplyr version {packageVersion(\"dplyr\")}.
+     Parts of the tutorial will give errors unless you update dplyr."
+    ))
+}
 
 #continue knitting after errors
 knitr::opts_chunk$set(echo = TRUE, rows.print = 3, error = TRUE)
@@ -35,7 +40,7 @@ The `dplyr` solution is usually easier to write and understand, and can be faste
 
 There are many function in `dplyr`, this tutorial focuses on the functions I find most useful.
 
-This tutorial is designed for the new `dplyr` version >= 1.0.0. 
+This tutorial is designed for `dplyr` version >= 1.0.0. 
 
 
 ### Load the package
@@ -44,7 +49,7 @@ This tutorial is designed for the new `dplyr` version >= 1.0.0.
 library("tidyverse")
 library("conflicted") # prevent conflict errors
 conflict_prefer("select", winner = "dplyr")
-conflict_prefer("select", winner = "dplyr")
+conflict_prefer("filter", winner = "dplyr")
 ```
 
 
