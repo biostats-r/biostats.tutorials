@@ -1,5 +1,6 @@
 ---
-title: "Manipulating data frames"
+title: "Using dplyr"
+description: Manipulating data frames with dplyr
 author: Richard J. Telford
 output: 
   learnr::tutorial:
@@ -17,10 +18,10 @@ if(packageVersion("dplyr") < "1.0.0"){
     ))
 }
 
-#continue knitting after errors
+# continue knitting after errors
 knitr::opts_chunk$set(echo = TRUE, rows.print = 3, error = TRUE)
 
-#packages
+# packages
 library("learnr")
 library("tidyverse")
 theme_set(theme_classic())
@@ -59,19 +60,22 @@ We can get more feedback on what `dplyr` functions have done to the data by load
 
 ```{r tidylog, include = FALSE}
 library("tidylog")
-#use map from purrr to iterate over tidylog functions to prevent conflict with dplyr
+# use purrr::map to iterate over tidylog functions to prevent conflict with dplyr
 map(getNamespaceExports("tidylog"), ~conflict_prefer(.x, "tidylog", quiet = TRUE))
 ```
 
 More than once, `tidylog` has helped identified bugs in my code.
 
-## The iris dataset
+## The `penguins` dataset
 
-This tutorial will use the built-in [iris](https://en.wikipedia.org/wiki/Iris_flower_data_set) dataset.
-This dataset includes floral dimensions from three species of iris.
+This tutorial will use the `penguins` dataset from the [`palmerpenguins` package](https://github.com/allisonhorst/palmerpenguins).
+This dataset includes measurements of three species of penguin.
 
-```{r iris}
-iris
+```{r penguins}
+# Load the data
+data("penguins", package = "palmerpenguins")
+# Show the data
+penguins
 ```
 
 
@@ -83,18 +87,19 @@ The first argument is the data, which is supplied by the pipe `%>%`, the next ar
 The names do not need quote marks.
 
 ```{r select1}
-#select Sepal.Length, Sepal.Width, Species
-iris %>% select(Sepal.Length, Sepal.Width, Species)
+#select species, bill_length_mm & bill_depth_mm
+penguins %>% 
+  select(species, bill_length_mm, bill_depth_mm)
 ```
 
 
 This is equivalent to the base R code
 
 ```{r select1.5}
-#select Sepal.Length, Sepal.Width, Species
-iris[, c("Sepal.Length", "Sepal.Width", "Species")]
+#select species, bill_length_mm & bill_depth_mm
+penguins[, c("species", "bill_length_mm", "bill_depth_mm")] 
 ```
-
+Remember that if you want to use the output of this code in a further analysis, you need to assign it to an object name with `<-`.
 
 ### `select` helpers  
 
@@ -105,48 +110,48 @@ Fortunately there are some helper functions.
 If you want to `select` adjacent columns, you can use the notation `first:last`.
 
 ```{r select2}
-#select Sepal.Length to Petal.Width
-iris %>% select(Sepal.Length:Petal.Width)
+#select species to bill_depth_mm
+penguins %>% select(species:bill_depth_mm)
 ```
 
 Sometimes it is easier to remove the columns you don't want. 
 You can do this by putting a `-` in front of the column name.
 
 ```{r select3}
-#select Sepal.Length, Sepal.Width, Species
-iris %>% select(-Petal.Length, -Petal.Width)
+#select everything but year and sex
+penguins %>% select(-year, -sex)
 ```
 
 If there is a pattern to the column names that we want to select (or remove), there are some helper functions.
-For example, to select columns that start with "Sepal", we can use the function `starts_with`.
+For example, to select columns that start with "bill", we can use the function `starts_with`.
 
 ```{r select4}
-#select Sepal.Length, Sepal.Width, Species
-iris %>% select(starts_with("Sepal"))
+#select bill_length_mm & bill_depth_mm" 
+penguins %>% select(starts_with("bill"))
 ```
 
-Conversely, if we want to select all columns that end with "Width", we can use the function `ends_with()`.
-`contains()` is more flexible and `matches()` is the most powerful of the helper functions, using regular expressions to identify the columns.
+Conversely, if we want to select all columns that end with "mm", we can use the function `ends_with()`.
+`contains()` is more flexible and `matches()` is the most powerful of the helper functions, using [regular expressions]("5-text-manipulation.html") to identify the columns.
 
 Sometimes, you might want to select all the columns of a certain type. 
-For example, to select all the numeric columns we can use the `is.numeric` function inside select.
+For example, to select all the numeric columns we can use the `is.numeric` function inside `select` with the helper `where`.
 
 ```{r select5}
-iris %>% select(where(is.numeric)) # No brackets on the function
+penguins %>% select(where(is.numeric)) # No brackets on the function
 ```
 
 Other `is.*` functions exist, for example, `is.character` for text, `lubridate::is.Date` for dates.
 
-You can also select columns by number (1 being the first column), but this is generally a bad idea because if a new column is added, or the column order is changed, the code will break.
+You can also select columns by number (1 being the first column), but this is generally a bad idea because it makes the code difficult to understand and if a new column is added, or the column order is changed, the code will break.
 
 ### Your turn
 
-Find at least three different ways to select the Sepal.Width and Petal.Width columns from iris
+Find at least three different ways to select the bill_length_mm and bill_depth_mm columns from penguins
 
 ```{r select-ex, exercise = TRUE}
-iris %>% select()
-iris %>% select()
-iris %>% select()
+penguins %>% select()
+penguins %>% select()
+penguins %>% select()
 
 ```
 
@@ -154,16 +159,20 @@ iris %>% select()
 ```{r select-ex-solution}
 
 #direct
-iris %>% select(Sepal.Width, Petal.Width)
+penguins %>% select(bill_length_mm, bill_depth_mm)
 
 #negative
-iris %>% select(-Sepal.Length, -Petal.Length, -Species)
+penguins %>% select(-species, -island, -flipper_length_mm, -body_mass_g, - sex, -year)
 
-#ends with
-iris %>% select(ends_with("Width"))
+#starts with
+penguins %>% select(starts_with("bill"))
 
 #matches regular expression
-iris %>% select(matches("Width$"))
+penguins %>% select(matches("^bill"))
+
+#numeric position
+penguins %>% select(3:4)
+
 ```
 
 Which of these strategies works best is context dependent.
@@ -173,7 +182,7 @@ Which of these strategies works best is context dependent.
 You can use `rename()` to rename columns
 
 ```{r rename1}
-iris %>% rename(spp = Species)
+penguins %>% rename(Species = species)
 ```
 
 The syntax is `new_name = current_name`.
@@ -182,7 +191,7 @@ You can also rename a column when selecting.
 This is convenient if you are using `select` anyway.
 
 ```{r rename2}
-iris %>% select(spp = Species)
+penguins %>% select(Species = species)
 ```
 
 
@@ -192,7 +201,7 @@ Sometimes it is useful to reorder the columns.
 This is never necessary for data analysis or plotting, but can be needed when making a table for presentation.
 
 ```{r relocate}
-iris %>% relocate(Species)
+penguins %>% relocate(island)
 ```
 
 The default is to move the named column first, the `.before` and `.after` arguments let you move the column into any position. 
@@ -201,10 +210,10 @@ The default is to move the named column first, the `.before` and `.after` argume
 
 Filtering rows that meet some condition is a very common task.
 
-For example, to filter rows that have a sepal length greater than 6, we can use 
+For example, to filter rows of `penguins` that have a bill length greater than 40 mm, we can use 
 
 ```{r filter1}
-iris %>% filter(Sepal.Length > 6)
+penguins %>% filter(bill_length_mm > 40)
 ```
 
 This will filter out each row where the condition is TRUE.
@@ -212,7 +221,7 @@ This will filter out each row where the condition is TRUE.
 The base R equivalent of this is 
 
 ```{r filter_base}
-iris[iris$Sepal.Length > 6, ]
+penguins[penguins$bill_length_mm > 40, ]
 ```
 
 Generally, `filter` makes it easier to understand, especially with more complex criteria.
@@ -221,7 +230,7 @@ Generally, `filter` makes it easier to understand, especially with more complex 
 Other tests include 
 
 - `==` exactly equals. Often a bad idea to use with numeric data 
-- `near` safe function for testing equality of numeric data as it has a tolerance of rounding errors
+- `near` safe function for testing equality of numeric data as it has a tolerance for rounding errors.
 
 ```{r filter-near}
 sqrt(2) ^ 2 == 2 # should be true, but rounding errors 
@@ -239,9 +248,11 @@ near(sqrt(2) ^ 2, 2) # safe alternative
 - `%in%` is used when you want to test if a value is in a vector
 
 ```{r filter-in}
-iris %>% filter(Species %in% c("setosa", "versicolor"))
+penguins %>% 
+  filter(species %in% c("Adelie", "Chinstrap"))
 #equivalent to 
-iris %>% filter(Species == "setosa" | Species == "versicolor")
+penguins %>% 
+  filter(species == "Adelie" | species == "Chinstrap") # with many alternatives, this gets long
 ```
 
 ### Filtering on multiple criteria
@@ -251,20 +262,22 @@ If we want to filter on multiple criteria, we need to decide whether we want all
 If we want all criteria to be TRUE, we can separate them by a comma (or by an `&` if you want to be explicit).
 
 ```{r filter-AND}
-iris %>% filter(Sepal.Length > 6, Petal.Length > 6)
+penguins %>% 
+  filter(bill_length_mm > 40, bill_depth_mm > 18)
 ```
 
 If we want any criteria to be TRUE, we can separate them by a `|`.
 
 ```{r filter-OR}
-iris %>% filter(Sepal.Length > 6 | Petal.Length > 6)
+penguins %>% 
+  filter(bill_length_mm > 40 | bill_depth_mm > 18)
 ```
 
 We can negate a criterion by putting `!` in front of it.
-So to filter rows that do not have sepals longer than 6 we can use
+So to filter rows that do not have bills longer than 40 mm we can use
 
 ```{r filter-NOT}
-iris %>% filter(!Sepal.Length > 6)
+penguins %>% filter(!bill_length_mm > 40)
 ```
 
 Of course, in this example, we could also use `<=` as the test.
@@ -272,24 +285,25 @@ Of course, in this example, we could also use `<=` as the test.
 
 ### Your turn
 
-Filter the iris dataset so that it only has the species versicolor.
+Filter the penguins dataset so that it only has the species Chinstrap.
 
 ```{r filter-ex, exercise = TRUE}
-iris %>% filter()
+penguins %>% filter()
 ```
 
 ```{r filter-ex-solution, exercise = TRUE}
-iris %>% filter(species == "versicolor")
+penguins %>% filter(species == "Chinstrap")
 ```
 
-Filter the iris dataset so that it only has petal length between 6 and 7 cm.
+Filter the penguins dataset so that it only has flipper lengths between 200 and 210 mm.
 
 ```{r filter-ex2, exercise = TRUE}
-iris %>% filter()
+penguins %>% filter()
 ```
 
 ```{r filter-ex2-solution, exercise = TRUE}
-iris %>% filter(between(Petal.Length, left = 6, right = 7))
+penguins %>% 
+  filter(between(flipper_length_mm, left = 200, right = 210))
 ```
 
 
@@ -300,13 +314,13 @@ Only the latter is a test of equality.
 If you do this, the error message is quite helpful.
 
 ```{r filter-error, error=TRUE}
-iris %>% filter(species = "versicolor")
+penguins %>% filter(species = "Chinstrap")
 ```
 
 Another common error is to forget to quote any strings.
 
 ```{r filter-error2, error=TRUE}
-iris %>% filter(species == versicolor)
+penguins %>% filter(species == Chinstrap)
 ```
 
 
@@ -316,7 +330,7 @@ iris %>% filter(species == versicolor)
 Sometimes it is useful to extract rows by row number. 
 
 ```{r slice}
-iris %>% slice(3:7)
+penguins %>% slice(3:7)
 ```
 
 You can use negative numbers to remove rows. 
@@ -329,13 +343,13 @@ If there are duplicates in the data, we can remove these with `distinct()`.
 `distinct()` with no extra arguments will remove duplicate rows. 
 
 ```{r}
-iris %>% distinct()
+penguins %>% distinct()
 ```
 
 If we are only interested in some of the columns, we can supply the names of these columns.
 
 ```{r}
-iris %>% distinct(Species)
+penguins %>% distinct(island)
 ```
 
 Other columns will be removed unless the argument `.keep_all = TRUE` is used.
@@ -347,7 +361,7 @@ Two useful functions for this are `sample_n` and `sample_frac`.
 The first samples a constant _n_ rows, the second samples a constant fraction of the rows.
 
 ```{r sample-n}
-iris %>% sample_n(size = 10)
+penguins %>% sample_n(size = 10)
 ```
 
 
@@ -355,10 +369,11 @@ iris %>% sample_n(size = 10)
 
 The function `mutate()` can add an new column or replace an existing one.
 
-To make a new column called `sepal_ratio` we can use
+To make a new column called `body_mass_kg` we can use
 
 ```{r}
-iris %>% mutate(sepal_ratio = Sepal.Length / Sepal.Width)
+penguins %>% 
+  mutate(body_mass_kg = body_mass_g / 1000)
 ```
 
 There are lots of functions that are useful to use with mutate. 
@@ -372,22 +387,22 @@ Any function that returns either a single value or as many values as are in the 
 
 ### Your turn
 
-Create a column with the mean sepal length.
-Then filter the dataset to keep just the rows with a sepal length greater than the mean sepal length
+Create a column with the mean flipper length.
+Then filter the dataset to keep just the rows with a flipper length greater than the mean flipper length
 
 ```{r mutate-ex, exercise = TRUE}
-iris %>% 
-  mutate()
+penguins %>% 
+  mutate() %>% 
+  filter()
 ```
 ```{r mutate-ex-solution}
-iris %>% 
-  mutate(sep_len_mean = mean(Sepal.Length)) %>%
-  filter(Sepal.Length > sep_len_mean)
+penguins %>% 
+  mutate(flip_len_mean = mean(flipper_length_mm, na.rm = TRUE)) %>%
+  filter(flipper_length_mm > flip_len_mean)
 
 #Also possible in one step
-iris %>%
-  filter(Sepal.Length > mean(Sepal.Length))
-
+penguins %>%
+  filter(flipper_length_mm > mean(flipper_length_mm, na.rm = TRUE))
 ```
 
 
@@ -395,9 +410,14 @@ iris %>%
 ## Summarising data with `summarise`
 
 `summarise` lets us summarise data.
+We can use it if we want to calculate a summary statistic of the data. 
+Remember to separate arguments with a comma.
 
 ```{r summarise1}
-iris %>% summarise(sepal_len_mean = mean(Sepal.Length), sepal_len_sd = sd(Sepal.Length))
+penguins %>% summarise(
+  flipper_len_mean = mean(flipper_length_mm, na.rm = TRUE), 
+  flipper_len_sd = sd(flipper_length_mm, na.rm = TRUE)
+  )
 ```
 
 Only the columns created in the `summarise` and any grouping columns (see below) will be kept.
@@ -409,28 +429,28 @@ This can be done with the `across` helper function.
 `across` needs to be told which columns to process and what function or functions to use.
 
 ```{r across}
-iris %>%
-   summarise(across(c(Petal.Length, Petal.Width),  .fns = mean))
+penguins %>%
+   summarise(across(c(bill_length_mm, bill_depth_mm),  .fns = mean, na.rm = TRUE))
 
-
-iris %>%
-  summarise(across(.cols = starts_with("Sepal"), .fns = list(sd = sd,mean = mean)))
+#using a list of functions
+penguins %>%
+  summarise(across(.cols = starts_with("bill"), .fns = list(sd = sd, mean = mean), na.rm = TRUE))
 ```
 
-You can also use `across` with `mutate`.
+You can also use `across` with `mutate` to mutate several columns at the same time.
 
 
 ## Grouping data with `group_by`
 
-`group_by()` changes the way that many of the other `dplyr` functions work.
+`group_by()` changes the way that many of the `dplyr` functions work.
 Instead of working on the entire dataset, they now work on each group in the data
 
-To find the mean sepal length for each species, we need to `group_by` species and then `summarise`.
+To find the mean flipper length for each species, we need to `group_by` species and then `summarise`.
 
 ```{r group-by}
-iris %>% 
-  group_by(Species) %>% 
-  summarise(mean_sepal_length = mean(Sepal.Length))
+penguins %>% 
+  group_by(species) %>% 
+  summarise(mean_flipper_length = mean(flipper_length_mm))
 ```
 
 
@@ -440,21 +460,21 @@ This can help prevent surprises!
 
 ### Your turn
 
-Modify your code from the `mutate` task to filter rows where the sepal length is greater than the mean of the relevant species.
+Modify your code from the `mutate` task to filter rows where the flipper length is greater than the mean of the relevant species.
 
 ```{r group_by-ex, exercise = TRUE}
-iris %>% 
+penguins %>% 
 ```
 ```{r group_by-solution}
-iris %>% 
-  group_by() %>%
-  mutate(sep_len_mean = mean(Sepal.Length)) %>%
-  filter(Sepal.Length > sep_len_mean)
+penguins %>% 
+  group_by(species) %>%
+  mutate(flip_len_mean = mean(flipper_length_mm, na.rm = TRUE)) %>%
+  filter(flipper_length_mm > flip_len_mean)
 
 #Also possible in one step
-iris %>%
-  group_by(Species) %>%
-  filter(Sepal.Length > mean(Sepal.Length))
+penguins %>%
+  group_by(species) %>%
+  filter(flipper_length_mm > mean(flipper_length_mm, na.rm = TRUE))
 ```
 
 
@@ -463,14 +483,14 @@ iris %>%
 To sort the data frame by one or more of the variables we can use `arrange`.
 
 ```{r arrange1}
-iris %>% arrange(Sepal.Length, Petal.Length)
+penguins %>% arrange(bill_length_mm, bill_depth_mm)
 ```
 
 This will sort smallest first. 
 To reverse the sort order, use `desc()`
 
 ```{r arrange2}
-iris %>% arrange(desc(Sepal.Length), desc(Petal.Length))
+penguins %>% arrange(desc(bill_length_mm), desc(bill_depth_mm))
 ```
 
  
@@ -480,13 +500,16 @@ The function `n` can count how many rows there are in the each group (or, less u
 It can be used with either `mutate` or `summarise`.
 
 ```{r n}
-iris %>% group_by(Species) %>% summarise(n = n())
+penguins %>% 
+  group_by(species) %>% 
+  summarise(n = n())
 ```
 
 `count` roughly equivalent to this
 
 ```{r count}
-iris %>% count(Species)
+penguins %>% 
+  count(species)
 ```
 
 
@@ -495,34 +518,38 @@ iris %>% count(Species)
 All the `dplyr` functions we have looked at so far work on a single data frame.
 Joins work on two data frames, combining them according to a common variable.
 
-For example, the `iris_height` data frame has the height of three iris species.
+For example, the `penguin_islands` data frame has the location of the three islands in the penguins dataset.
 
-```{r iris-height}
-iris_height <- tribble(
-  ~ Species, ~ height, # tribble is a convenient way to make small datasets
-  "verna", 15,
-  "versicolor", 80,
-  "virginica",  90)
+```{r penguin-islands}
+penguin_islands <- tribble(
+  ~ island, ~ Latitude, ~ Longitude, # tribble is a convenient way to make small datasets
+  "Torgersen", -64.766667,-64.083333,
+  "Biscoe", -64.818569, -63.775636,
+  "Dream",  -64.733333, -64.233333, 
+  "Alpha", -64.316667, -63)
 
-iris_height
+penguin_islands
 ```
 
-We can use a join to merge these data with the original iris data. 
+We can use a join to merge these data with the original penguin data. 
 The `by` argument tells the join which column to make the join by.
 Here, we are joining by a single column with the same name in both data frames.
 It is possible to join by multiple columns and where the columns have different names in each dataset.
 
-```{r iris-leftjoin}
-iris2 <- iris %>% group_by(Species) %>% slice(1:2) # small version of data for easy viewing
+```{r penguin-leftjoin}
+penguin2 <- penguin %>% 
+  group_by(species) %>% 
+  slice(1:2) # small version of data for easy viewing
 
-iris2 %>% left_join(iris_height, by = "Species")
+penguin2 %>%
+  left_join(penguin_islands, by = "island")
 ```
 
-Only two of taxa in the original dataset are in the `iris_height` data set. 
+Only three of the four islands in `penguin_islands` have data in the `penguins` data set. 
 Different variants of join will treat this in different ways.
 
 - `left_join` will take all rows from the first (left) data frame and matching rows from the second (right). 
-- `right_join` does the opposite to `left_join`.
+- `right_join` does the opposite to `left_join`, taking all rows from the second (right) data frame and matching rows from the first.
 - `inner_join` will take only rows that match in both data frames.
 - `full_join` will take all rows from in both data frames.
 
@@ -537,6 +564,7 @@ If we have two or more data frames that we want to combine.
 If the data frames contain information about the same observations, they can be combined with `bind_cols`.
 
 So data1, data2, and data3 can be combined to make one data frame with many columns
+
 ```{r bind-cols, eval = FALSE}
 bind_cols(data1, data2, data3)
 ```
@@ -548,24 +576,18 @@ If possible, use a join instead.
 
 ### More rows - `bind_rows`
 
-If the data frame contain more obserations (rows), and typically at least some of the same columns, they can be combined with `bind_rows`.
+If the data frame contain more observations (rows), and typically at least some of the same columns, they can be combined with `bind_rows`.
 This is useful if, for example, there are data from two years that need combining.
 
-One feature of `bind_cols` that I find useful is the `.id` argument that makes an extra column for the 
+One feature of `bind_rows` that I find useful is the `.id` argument that makes an extra column for an identifier.
 
 ```{r bind-rows, eval = TRUE}
-iris_height <-  tribble( ~ Species, ~ height,
-                         "versicolor", 80,
-                         "virginica",  90)
+svalbard_islands <-  tribble( ~ island, ~ Latitude, ~ Longitude
+   "Nordaustlandet", 79.558405, 24.017351,
+ "Prins Karls Forland", 78.554090, 11.256545)
 
-pyrola_height <- tribble( ~ Species, ~ height,
-                          "minor", 15,
-                          "media", 30)
-
-bind_rows(Iris = iris_height, pyrola = pyrola_height, .id = "Genus")
+bind_rows(Palmer = penguin_islands, Svalbard = svalbard_islands, .id = "Archipelago")
 ```
-
-
 
 
 ## Common problems
@@ -581,15 +603,9 @@ df
 df %>% rename(region_country = `Region/Country`)
 ```
 It is sometimes best to rename these columns to make them easier to refer to. 
-The `janitor` package can help if there are many columns to rename.
-
-## advanced ??
-nest unnest
-map
 
 ## Resources
 
 [stat545](https://stat545.com/dplyr-intro.html)
 [R for data science](https://r4ds.had.co.nz/) (Online copy of book)
 [`dplyr` cheatsheet](https://rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf)
-
