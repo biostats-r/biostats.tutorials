@@ -4,3 +4,4 @@
 ^inst/tutorials/Dates-and-times/Dates-and-times\.Rmd$
 ^inst/tutorials/text-manipulation/text-manipulation\.Rmd$
 ^inst/tutorials/using-dplyr/using-dplyr\.Rmd$
+^README\.Rmd$
