@@ -1,6 +1,7 @@
 ---
 title: "Processing text with `stringr`"
 author: Richard J. Telford
+description: Processing text with stringr and regular expressions
 output: 
   learnr::tutorial:
     progressive: true
