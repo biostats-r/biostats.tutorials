@@ -1,13 +1,13 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# data.handling
+# biostats.tutorials
 
 <!-- badges: start -->
 
 <!-- badges: end -->
 
-The data.handling package includes several tutorials to reach
+The biostats.tutorials package includes several tutorials to reach
 reproducible data analysis with R with the tidyverse package.
 
 # Data handling with tidyverse
@@ -43,6 +43,7 @@ learnr::available_tutorials(package = "biostats.tutorials")
 #> Available tutorials:
 #> * biostats.tutorials
 #>   - Dates-and-times   : "Working with dates and times"
+#>   - naming-objects    : "Naming objects"
 #>   - text-manipulation : "Processing text with `stringr`"
 #>   - tidying-data      : "Tidying data with tidyr"
 #>   - using-dplyr       : "Using dplyr"
