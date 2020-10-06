@@ -43,6 +43,7 @@ learnr::available_tutorials(package = "biostats.tutorials")
 #> Available tutorials:
 #> * biostats.tutorials
 #>   - Dates-and-times   : "Working with dates and times"
+#>   - function-packages : "Functions and Packages"
 #>   - naming-objects    : "Naming objects"
 #>   - text-manipulation : "Processing text with `stringr`"
 #>   - tidying-data      : "Tidying data with tidyr"
