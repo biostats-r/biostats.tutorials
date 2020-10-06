@@ -3,3 +3,4 @@
 ^\.Rproj\.user$
 ^README\.Rmd$
 ^inst/tutorials/tidying-data/tidying-data\.Rmd$
+^inst/tutorials/naming-objects/naming-objects\.Rmd$
