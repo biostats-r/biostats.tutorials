@@ -32,18 +32,18 @@ This project is designed to help you process your raw data entirely with R so th
 
 ## Installation
 
-You can install `data.handling`
-from [GitHub](https://github.com/) with:
+You can install `biostats.tutorials`
+from [GitHub](https://github.com/biostats-r/biostats.tutorials) with:
 
 ``` r
 # install.packages("remotes")
-remotes::install_github("Bio302-UiB/data-handling")
+remotes::install_github("biostats-r/biostats.tutorials")
 ```
 
 To access the tutorials, you first need to load the package.
 
 ```{r library, include=FALSE}
-library(data.handling)
+library(biostats.tutorials)
 ```
 
 The tutorials should appear in the tutorials tab.
@@ -52,13 +52,13 @@ This is normally in the top right pane of Rstudio next to the Environment and Hi
 You can also get a list of the available tutorials by running 
 
 ```{r available-tutorials}
-learnr::available_tutorials(package = "data.handling")
+learnr::available_tutorials(package = "biostats.tutorials")
 ```
 
 Tutorials can be run with 
 
 ```{r run-tutorial, eval = FALSE}
-learnr::run_tutorial("Dates-and-times", package = "data.handling")
+learnr::run_tutorial("Dates-and-times", package = "biostats.tutorials")
 ```
 
 

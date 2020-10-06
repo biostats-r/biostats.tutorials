@@ -23,11 +23,12 @@ R so that it is ready for plotting and statistical analysis.
 
 ## Installation
 
-You can install `data.handling` from [GitHub](https://github.com/) with:
+You can install `biostats.tutorials` from
+[GitHub](https://github.com/biostats-r/biostats.tutorials) with:
 
 ``` r
 # install.packages("remotes")
-remotes::install_github("Bio302-UiB/data-handling")
+remotes::install_github("biostats-r/biostats.tutorials")
 ```
 
 To access the tutorials, you first need to load the package.
@@ -38,16 +39,17 @@ the top right pane of Rstudio next to the Environment and History tabs.
 You can also get a list of the available tutorials by running
 
 ``` r
-learnr::available_tutorials(package = "data.handling")
+learnr::available_tutorials(package = "biostats.tutorials")
 #> Available tutorials:
-#> * data.handling
+#> * biostats.tutorials
 #>   - Dates-and-times   : "Working with dates and times"
 #>   - text-manipulation : "Processing text with `stringr`"
+#>   - tidying-data      : "Tidying data with tidyr"
 #>   - using-dplyr       : "Using dplyr"
 ```
 
 Tutorials can be run with
 
 ``` r
-learnr::run_tutorial("Dates-and-times", package = "data.handling")
+learnr::run_tutorial("Dates-and-times", package = "biostats.tutorials")
 ```
