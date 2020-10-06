@@ -13,12 +13,12 @@ knitr::opts_chunk$set(
 )
 ```
 
-# data.handling
+# biostats.tutorials
 
 <!-- badges: start -->
 <!-- badges: end -->
 
-The data.handling package includes several tutorials to reach reproducible data analysis with R with the tidyverse package.
+The biostats.tutorials package includes several tutorials to reach reproducible data analysis with R with the tidyverse package.
 
 # Data handling with tidyverse
 
