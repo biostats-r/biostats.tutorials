@@ -281,7 +281,7 @@ If we want to remove some character, we can either use `str_replace` and set `re
 We can use `str_replace` on a column in a tibble with a `mutate`
 
 ```{r replace-tibble}
-message(str(mutate))
+saveRDS(mutate, file = "mutate.RDS")
 diatom_df %>% 
   mutate(species = str_replace(string = species,
                                pattern = "_", 
