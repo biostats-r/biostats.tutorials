@@ -101,8 +101,8 @@ Metacharacters are like wildcards in that they can match different literal chara
 - `\D` matches anything that is not a digit.
 - `\s` matches any whitespace. 
 - `\S` matches anything that is not whitespace
-- `\w` matches any alphanumeric character
-- `\W` matches anything that is not alphanumeric
+- `\w` matches any alphanumeric character or underscore
+- `\W` matches anything that is not alphanumeric or underscore
 
 Because the `\` is a special character, it needs to be escaped with another backslash.
 So to match white space character, use `\\s`.
@@ -146,7 +146,7 @@ If we want to match a repeating series of characters
 We can control how many times something gets matched by following it with a quantifier. 
 
 
-- `?`: Zero or more times 
+- `?`: Zero or one times 
 - `+`: One or more times
 - `*`: Any number of times 
 - `{2}`: Exactly twice 
@@ -392,3 +392,11 @@ This is useful in when making a figure if captions or labels are too long.
 ```{r str-wrap}
 str_wrap("The quick brown fox jumps over the lazy dog.", width = 30)
 ```
+
+## Further resources
+
+- [Rstudio Strings Cheatsheet](https://github.com/rstudio/cheatsheets/raw/master/strings.pdf) for help with `stringr` and regular expressions.
+
+ - [regex101](https://regex101.com/) Regular expressions tester. Provide some test strings and your regular expression to see what matches. Note that it uses a single backslash to escape where R would use double backslash. 
+
+
