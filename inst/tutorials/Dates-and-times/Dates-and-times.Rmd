@@ -8,7 +8,7 @@ output:
     allow_skip: true
 description: Manipulating dates and times with the lubridate package
 runtime: shiny_prerendered
-css: css/style-chapter.css
+css: css/style-tutorial.css
 ---
 
 
