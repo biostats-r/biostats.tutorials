@@ -2,6 +2,7 @@
 title: "Tidying data with tidyr"
 output: learnr::tutorial
 runtime: shiny_prerendered
+css: css/style-tutorial.css
 ---
 
 ```{r setup, include=FALSE}
