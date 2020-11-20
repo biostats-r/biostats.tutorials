@@ -15,7 +15,11 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Suggests: 
     tidyverse,
-    learnr,
     conflicted
 Imports: 
-    rstudioapi
+    rstudioapi,
+    learnr,
+    rmarkdown,
+    purrr,
+    glue,
+    fs
