@@ -1,3 +1,4 @@
+#' @importFrom utils packageName
 #' 
 .onAttach <- function(libname, pkgname){
   if(!interactive()){
