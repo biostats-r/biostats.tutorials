@@ -283,7 +283,7 @@ If we want to remove some characters, we can either use `str_replace` and set `r
 
 We can use `str_replace` on a column in a tibble with a `mutate`
 
-```{r replace-tibble}
+```{r replace-tibble, eval = FALSE}
 diatom_df %>% 
   mutate(species = str_replace(string = species,
                                pattern = "_", 
