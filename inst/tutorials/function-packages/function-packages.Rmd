@@ -29,6 +29,20 @@ Missing commas out is a common mistake and will give an error.
 rnorm(n = 10, mean = 5 sd = 1)
 ```
 
+To get help on a function, use a `?`.
+
+```{r help, eval = FALSE}
+?rnorm
+```
+
+The examples at the bottom of the help file can be useful to understand how to use the function.
+You can run the examples either by copying and pasting them, or using `example()`.
+
+```{r example, eval = FALSE}
+example(rnorm)
+```
+
+
 ### infix function
 
 There is a special type of function called an infix function that does not use brackets but is placed between two objects.
@@ -116,18 +130,22 @@ Some recommendations
 
 ## Name conflicts
 
+### The problem
+
 ```{r, echo = FALSE}
 options(tibble.print_max = 2)
 ```
 
 Sometimes two packages have functions with the same names. 
 For example, both `MASS` and `dplyr` have a `select` function which does completely different things. 
-If both packages are loaded at the same time there is a conflict and the function that was loaded last takes priority. This can cause big problems. 
+If both packages are loaded at the same time there is a conflict and the function that was loaded last takes priority.
+This can cause big problems, with difficult to interpret error messages. 
 
 ```{r, error = TRUE}
+library(palmerpenguins)#load data
 library(dplyr)
 library(MASS) # R will report that select is being masked
-iris %>% select(Species)
+penguins %>% select(species)
 ```
 
 If you have code that worked one day and fails the next with a weird error messages, it might be because of a name conflict. 
@@ -146,7 +164,7 @@ Use the `package::function` notation to specify which package a function comes f
 This is safe and can make code easier to understand by showing which packages the functions are from. The code above could be written safely as
 
 ```{r, error = TRUE}
-iris %>% dplyr::select(Species)
+penguins %>% dplyr::select(species)
 ```
 
 This gets ugly fairly quickly, so is best used with packages that you only need a few functions from once or twice, not functions you need many times.
@@ -159,7 +177,7 @@ The safest solution is to use the [`conflicted` package](https://conflicted.r-li
 library(dplyr)
 library(MASS)
 library(conflicted)
-iris %>% select(Species)
+penguins %>% select(species)
 ```
 
 As the error message suggests, we can resolve the error either by using the `package::function` notation, or use the function `conflict_prefer` to say which function we want to use by default.  
@@ -169,7 +187,7 @@ library(dplyr)
 library(MASS)
 library(conflicted)
 conflict_prefer("select", "dplyr")
-iris %>% select(Species)
+penguins %>% select(species)
 ```
 
 

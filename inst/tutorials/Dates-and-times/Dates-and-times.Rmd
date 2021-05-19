@@ -22,7 +22,7 @@ conflict_prefer(name = "filter", winner = "dplyr")
 
 tutorial_options(exercise.cap = "Exercise")
 
-temperature <- read_csv(system.file("extdata/Florida_2020-04-20_2020-04-23_1589018968.csv", package = "data.handling"))
+temperature <- read_csv(system.file("extdata/Florida_2020-04-20_2020-04-23_1589018968.csv", package = "biostats.tutorials"))
 
 temperature2 <- temperature %>% 
   mutate(
