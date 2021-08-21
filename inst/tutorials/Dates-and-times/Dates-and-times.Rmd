@@ -24,7 +24,7 @@ tutorial_options(exercise.cap = "Exercise")
 
 temperature <- read_csv(system.file("extdata/Florida_2020-04-20_2020-04-23_1589018968.csv", package = "data.handling"))
 
-temperature2 <- temperature %>% 
+temperature2 <- temperature |> 
   mutate(
     date_time = paste(Dato, Tid), #combine
     date_time = ymd_hms(date_time)#convert
@@ -296,7 +296,7 @@ I want to make a single date-time column.
 To do this I need to combine the data and time columns with `paste`, and then use a `lubridate` function for the conversion. 
 
 ```{r date-time-temperature}
-temperature2 <- temperature %>% 
+temperature2 <- temperature |> 
   mutate(
     date_time = paste(Dato, Tid), #combine
     date_time = ymd_hms(date_time)#convert
@@ -308,7 +308,7 @@ temperature2
 `lubridate` functions `make_date` and `make_datetime` are useful if the year, month, day etc are in different columns.
 
 ```{r make-date}
-tibble(year = 2020, month = 10, day = 3) %>% 
+tibble(year = 2020, month = 10, day = 3) |> 
   mutate(date = make_date(year = year, month = month, day = day))
 ```
 
@@ -321,10 +321,10 @@ For example, to calculate the mean temperature of the afternoon of the 21st Apri
 `between` is a useful helper function here to avoid having to write a more complicated logical condition.
 
 ```{r filter-temperature}
-temperature2 %>% 
+temperature2 |> 
   filter(between(date_time, 
                  left = ymd_hm("2020-04-21 12:00"),
-                 right = ymd_hm("2020-04-21 17:00"))) %>% 
+                 right = ymd_hm("2020-04-21 17:00"))) |> 
   summarise(mean_temp = mean(Lufttemperatur))
 
 ```
@@ -334,12 +334,12 @@ temperature2 %>%
 Filter `temperature2` so that it just includes the mornings.
 
 ```{r filter-exercise, exercise = TRUE}
-temperature2 %>% 
+temperature2 |> 
   
 ```
 
 ```{r filter-exercise-solution}
-temperature2 %>% 
+temperature2 |> 
   filter(hour(date_time) < 12)
 ```
 
@@ -350,9 +350,9 @@ I often want to summarise climate data to calculate mean monthly temperatures.
 We can do an analogous task with the `temperature` dataset to calculate mean hourly temperatures.
 
 ```{r mean-hourly}
-temperature2 %>% 
-  mutate(hour = hour(date_time)) %>% 
-  group_by(hour) %>% 
+temperature2 |> 
+  mutate(hour = hour(date_time)) |> 
+  group_by(hour) |> 
   summarise(mean_temperature = mean(Lufttemperatur))
 ```
 
@@ -362,13 +362,13 @@ temperature2 %>%
 Find the mean temperature of each morning.
 
 ```{r morning-mean, exercise=TRUE}
-temperature2 %>% 
+temperature2 |> 
 ```
 
 ```{r morning-mean-solution}
-temperature2 %>% 
-  filter(hour(date_time) < 12) %>% 
-  group_by(Dato) %>%
+temperature2 |> 
+  filter(hour(date_time) < 12) |> 
+  group_by(Dato) |>
   summarise(morning_mean = mean(Lufttemperatur))
 ```
 

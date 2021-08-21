@@ -127,7 +127,7 @@ If both packages are loaded at the same time there is a conflict and the functio
 ```{r, error = TRUE}
 library(dplyr)
 library(MASS) # R will report that select is being masked
-iris %>% select(Species)
+iris |> select(Species)
 ```
 
 If you have code that worked one day and fails the next with a weird error messages, it might be because of a name conflict. 
@@ -146,7 +146,7 @@ Use the `package::function` notation to specify which package a function comes f
 This is safe and can make code easier to understand by showing which packages the functions are from. The code above could be written safely as
 
 ```{r, error = TRUE}
-iris %>% dplyr::select(Species)
+iris |> dplyr::select(Species)
 ```
 
 This gets ugly fairly quickly, so is best used with packages that you only need a few functions from once or twice, not functions you need many times.
@@ -159,7 +159,7 @@ The safest solution is to use the [`conflicted` package](https://conflicted.r-li
 library(dplyr)
 library(MASS)
 library(conflicted)
-iris %>% select(Species)
+iris |> select(Species)
 ```
 
 As the error message suggests, we can resolve the error either by using the `package::function` notation, or use the function `conflict_prefer` to say which function we want to use by default.  
@@ -169,7 +169,7 @@ library(dplyr)
 library(MASS)
 library(conflicted)
 conflict_prefer("select", "dplyr")
-iris %>% select(Species)
+iris |> select(Species)
 ```
 
 

@@ -63,7 +63,7 @@ diatom_df <- tibble(species = diatoms,
                     count = c(27, 3, 46))
 diatom_df
 
-diatom_df %>% 
+diatom_df |> 
   filter(str_detect(string = diatoms, pattern = "Navicula"))
 ```
 
@@ -283,7 +283,7 @@ We can use `str_replace` on a column in a tibble with a `mutate`
 
 ```{r replace-tibble}
 saveRDS(mutate, file = "mutate.RDS")
-diatom_df %>% 
+diatom_df |> 
   mutate(species = str_replace(string = species,
                                pattern = "_", 
                                replacement  = " "))
@@ -337,7 +337,7 @@ filenames <- c("c:/pond_2020.xls", "d:/data/marsh_2018.xls")
 ```{r extract-ex-solution}
 str_replace(filenames, pattern = ".*/(\\w*)_\\d{4}\\.xls$", replacement = "\\1")
 #or extract word followed by an "_", then remove "_"
-str_extract(filenames, pattern = "\\w*_") %>% 
+str_extract(filenames, pattern = "\\w*_") |> 
   str_remove(pattern = "_")
 ```
 
