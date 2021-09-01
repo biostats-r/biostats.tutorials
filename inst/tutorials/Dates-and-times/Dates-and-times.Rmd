@@ -22,13 +22,17 @@ conflict_prefer(name = "filter", winner = "dplyr")
 
 tutorial_options(exercise.cap = "Exercise")
 
-temperature <- read_csv(system.file("extdata/Florida_2020-04-20_2020-04-23_1589018968.csv", package = "data.handling"))
+temperature <- read_csv(system.file("extdata/Florida_2020-04-20_2020-04-23_1589018968.csv", package = "biostats.tutorials"))
 
-temperature2 <- temperature |> 
+temperature2 <- temperature |>
   mutate(
     date_time = paste(Dato, Tid), #combine
     date_time = ymd_hms(date_time)#convert
-    ) 
+    )
+
+date1 <- "28/02/1999"
+
+date2 <- format(lubridate::now(), "%d %B %Y %H:%M")
 ```
 
 ## Date and times
@@ -83,21 +87,23 @@ See `?strptime` for the complete list.
 ### Your turn
 
 Use the `as.Date` (for the date) and `as.POSIXct` (for the datetime) to convert the following to dates or datetimes. 
+
+ - `date1 <-` "`r date1`"
+ - `date2 <-` "`r date2`"
+
 You will need to use the `format` argument to each function and read the `strptime` help.
-If you get an `NA`, the format arguement is not correct.
+If you get an `NA`, the format argument is not correct.
 
 
 ```{r base-dates, exercise = TRUE}
-date1 <- "28/02/1999"
+___(date1, ___ = ___)
 
-date2 <- "July 1 2001 2:14"
+___(date2, ___ = ___)
 ```
 
 ```{r base-dates-solution}
-date1 <- "28/02/1999"
 as.Date(date1, format = "%d/%m/%Y")
 
-date2 <- "July 1 2001 2:14"
 as.POSIXct(date2, format = "%B %d %Y %H:%M")
 ```
 
@@ -262,6 +268,11 @@ dmy("1 januar 2020")
 ```
 
 Or use the `locale` argument of `dmy`.
+
+```{r locale, eval = FALSE}
+dmy("1 januar 2020", locale = "nb_NO.utf8")# on ubuntu
+```
+
 
 To see the available locales on your computer, run 
 
