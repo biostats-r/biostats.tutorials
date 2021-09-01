@@ -35,7 +35,7 @@ tutorial_options(exercise.cap = "Exercise")
 Data frames are usually the most convenient objects for storing, plotting or analysing data in R. 
 We also need to be able to manipulate data in data frames.
 
-This tutorial will show you how to manipulate data frames using the `dplyr` package, part of the `tidyverse`.
+This tutorial will show you how to manipulate data frames using the `dplyr` package, part of `tidyverse`.
 
 Everything that can be done with `dplyr` can be done with base R. 
 The `dplyr` solution is usually easier to write and understand, and can be faster.
@@ -47,11 +47,16 @@ This tutorial is designed for `dplyr` version >= 1.0.0.
 
 ### Load the package
 
-```{r load-packages, include = FALSE}
+You can load `dplyr` with 
+
+```{r load-dplyr}
+library("dplyr")
+```
+
+But is is usually more convenient to load `tidyverse` so that you get `ggplot2`, `dplyr`, `readr` and other useful packages with one command.
+
+```{r load-packages, eval = FALSE}
 library("tidyverse")
-library("conflicted") # prevent conflict errors
-conflict_prefer("select", winner = "dplyr")
-conflict_prefer("filter", winner = "dplyr")
 ```
 
 
@@ -59,10 +64,12 @@ conflict_prefer("filter", winner = "dplyr")
 
 We can get more feedback on what `dplyr` functions have done to the data by loading the `tidylog` package.
 
-```{r tidylog, include = FALSE}
+```{r tidylog, echo = TRUE, message = FALSE}
 library("tidylog")
-# use purrr::map to iterate over tidylog functions to prevent conflict with dplyr
-map(getNamespaceExports("tidylog"), ~conflict_prefer(.x, "tidylog", quiet = TRUE))
+# if you are using conflicted, you will need to set conflict_prefer for all dplyr function
+# use purrr::map to iterate over tidylog functions 
+# library(conflicted)
+# map(getNamespaceExports("tidylog"), ~conflict_prefer(.x, winner = "tidylog"))
 ```
 
 More than once, `tidylog` has helped identified bugs in my code.
@@ -292,6 +299,7 @@ Filter the penguins dataset so that it only has the species Chinstrap.
 penguins |> filter()
 ```
 
+
 ```{r filter-ex-solution, exercise = TRUE}
 penguins |> filter(species == "Chinstrap")
 ```
@@ -301,6 +309,7 @@ Filter the penguins dataset so that it only has flipper lengths between 200 and 
 ```{r filter-ex2, exercise = TRUE}
 penguins |> filter()
 ```
+
 
 ```{r filter-ex2-solution, exercise = TRUE}
 penguins |> 
@@ -358,11 +367,12 @@ Other columns will be removed unless the argument `.keep_all = TRUE` is used.
 ## Random rows
 
 Sometimes you want to sample rows at random from a data.frame. 
-Two useful functions for this are `sample_n` and `sample_frac`. 
-The first samples a constant _n_ rows, the second samples a constant fraction of the rows.
+This can be done with `slice_sample` and `sample_frac`. 
+This can either sample a constant _n_ rows or constant fraction of the rows.
 
 ```{r sample-n}
 penguins |> sample_n(size = 10)
+
 ```
 
 
@@ -432,6 +442,7 @@ This can be done with the `across` helper function.
 ```{r across}
 penguins |>
    summarise(across(c(bill_length_mm, bill_depth_mm),  .fns = mean, na.rm = TRUE))
+
 
 #using a list of functions
 penguins |>
@@ -506,13 +517,14 @@ penguins |>
   summarise(n = n())
 ```
 
-`count` roughly equivalent to this
+Or with `count`
 
 ```{r count}
 penguins |> 
   count(species)
 ```
 
+`count` is more concise, but `group_by` and `summarise` is useful when you need to calculate more variables (for example mean and standard deviation). 
 
 ## Merging data frames with joins
 
@@ -538,6 +550,7 @@ Here, we are joining by a single column with the same name in both data frames.
 It is possible to join by multiple columns and where the columns have different names in each dataset.
 
 ```{r penguin-leftjoin}
+
 penguin2 <- penguin |> 
   group_by(species) |> 
   slice(1:2) # small version of data for easy viewing
@@ -555,6 +568,26 @@ Different variants of join will treat this in different ways.
 - `full_join` will take all rows from in both data frames.
 
 In all cases, missing values will are given an `NA`.
+
+## Filtering joins
+
+Filtering joins let you filter one dataset according to whether rows have a match in the a second dataset.
+
+`semi_join` finds rows that have a matching row
+
+```{r semi-join}
+penguin_islands %>% 
+  semi_join(penguins, by = "island")
+```
+
+`anti_join` finds rows that do not have a matching row
+
+```{r anti-join}
+penguin_islands %>% 
+  anti_join(penguins, by = "island")
+```
+
+These can be very useful when cleaning data to find problems.
 
 ## Binding data frames together
 
@@ -583,11 +616,14 @@ This is useful if, for example, there are data from two years that need combinin
 One feature of `bind_rows` that I find useful is the `.id` argument that makes an extra column for an identifier.
 
 ```{r bind-rows, eval = TRUE}
-svalbard_islands <-  tribble( ~ island, ~ Latitude, ~ Longitude
+svalbard_islands <-  tribble( ~ island, ~ Latitude, ~ Longitude,
    "Nordaustlandet", 79.558405, 24.017351,
  "Prins Karls Forland", 78.554090, 11.256545)
 
-bind_rows(Palmer = penguin_islands, Svalbard = svalbard_islands, .id = "Archipelago")
+bind_rows(
+  Palmer = penguin_islands, 
+  Svalbard = svalbard_islands, 
+  .id = "Archipelago")
 ```
 
 
@@ -607,6 +643,6 @@ It is sometimes best to rename these columns to make them easier to refer to.
 
 ## Resources
 
-[stat545](https://stat545.com/dplyr-intro.html)
-[R for data science](https://r4ds.had.co.nz/) (Online copy of book)
-[`dplyr` cheatsheet](https://rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf)
+- [stat545](https://stat545.com/dplyr-intro.html)
+- [R for data science](https://r4ds.had.co.nz/) (Online copy of book)
+- [`dplyr` cheatsheet](https://rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf)

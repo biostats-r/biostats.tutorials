@@ -1,0 +1,186 @@
+---
+title: "Importing data"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+
+## Importing data
+
+R can import data in many formats, including
+
+ - text files with delimiters between columns (e.g csv files)
+ - excel files
+ 
+Which this tutorial covers, but also databases (with the `DBI` package), and other formats with the `haven` package.
+
+Best practice is to leave the data in the format you get it rather than trying to convert it to some other format.
+
+## File paths
+
+R needs to be able to find your data files.
+
+Usually the best way to do this is to use paths relative to your RStudio projects working directory.
+
+The problem with using an absolute path, for example,
+
+```
+c:/my_directory/my_project/data/my_file.csv
+```
+
+Is that this makes it difficult to collaborate as collaborators may want to have the data in a different place.
+
+Much better is to put the data into a folder called `data` in your Rstudio project, and use a relative path.
+
+```
+data/my_file.csv
+```
+
+If you share your entire project, it will work without all the paths needing to be changed.
+
+### `here`
+
+Best practice is to use the `here` package to keep track of your working directory. 
+`here` will let your code work for people who do not use RStudio.
+
+```{r here, eval = FALSE}
+library(here)
+here("data", "my_file.csv")
+```
+
+### `setwd()`
+
+You probably never need to use `setwd()` if you have your RStudio project set up correctly.
+
+## Data organisation in spreadsheets
+
+Some data are easier to import than others.
+These are some recommendations from Broman and Woo (2018) that will make data easy to import.
+
+- be consistent, write dates like YYYY-MM-DD
+- do not leave any cells empty
+- put just one thing in a cell
+- organize the data as a single rectangle (with subjects as rows and variables as columns, and with a single header row) 
+- create a data dictionary
+- do not include calculations in the raw data files
+- do not use font colour or highlighting as data
+- choose good names for things
+
+Broman, K. W. & Woo, K. H. (2018) Data Organization in Spreadsheets, The American Statistician, [72:1, 2-10,](https://doi.org/10.1080/00031305.2017.1375989)
+
+## Importing text files with `readr`
+ 
+Text files with delimiters are probably the easiest type of data to import.
+
+Common delimiters are
+
+ - commas (csv)
+ - semi-colons (csv)
+ - tabs (txt or tab)
+ 
+ Open the file in a a text editor (NOT excel), to see what type of delimiter you have, and also check what the decimal separator is.
+ 
+Now you can import the file.
+
+
+```{r readr, eval = FALSE}
+library(readr) # part of tidyverse. not needed if tidyverse already loaded.
+
+my_data <- read_delim(file = "data/my_file.csv", delim = ",")
+```
+
+TIP: once you have typed the quotation marks, press Tab and RStudio will suggest possible files.
+
+`read_delim` has many arguments. 
+In addition to `file` and `delim`, some of the most useful are
+
+- `locale` : use this to change the decimal separator with `locale = locale(decimal_mark = ",")`
+- `skip` : skips some lines at the top of the file. 
+Useful if the file starts with some metadata.
+- `col_types` : `read_delim` will guess what type of data is in each column and convert it accordingly. 
+Sometimes it will make a mistake. 
+`col_types` will force it to use the correct type.
+
+See the help file for other arguments.
+
+The advantages of `read_delim` over the base R `read.table` and related functions are that it is faster, and gives information on problems in the data.
+
+## Importing Excel files with `readxl` 
+ 
+Excel (and other spreadsheet software) is convenient for entering data but xlsx and xls files are not the ideal format to store data in.
+However, if you are given/download data in Excel format, you should leave it in that format and import it directly to R.
+
+There are several packages that let you import excel files. 
+I usually find `readxl` to be the best (some of the others need Java installing - not always a fun experience - or are very slow)
+
+```{r read_excel, eval = FALSE}
+library(readxl) # installed with tidyverse, but NOT loaded with library(tidyverse)
+file <- "myfile.xls"
+# find the names of the excel sheets
+excel_sheets(path = file)
+
+#import the desired sheet - imports the first by default
+my_data <- read_excel(path = file, sheet = "Sheet1")
+```
+ 
+As with `read_delim`, `read_excel` has arguments to `skip` rows at the top of the file, or force the `col_types`.
+
+## Importing multiples files
+
+Sometimes you have multiple files to import, that have the same format. 
+For example, 12 files each containing weather data for one month.
+Of course, you can import them one-by-one, but that gets tedious and error prone once there are more than a few files.
+
+Instead we can use the `purrr` package to iterate over multiple files (or equivalently sheets in an excel file).
+
+Here is a minimal example
+
+```{r, eval = FALSE}
+library(tidyverse)#purrr is part of tidyverse
+list.files(path = "data", pattern = "\\.csv$", full.names = TRUE) %>% 
+  map_dfr(~read_delim(file = .x, delim = ","))
+```
+
+`list.files` will list all the csv files in the data directory in a vector.
+The pipe passes this to `map_dfr` which will iterate over the vector, importing files one at a time and combining all the files into one large data frame.
+ 
+## Creating small data sets with code
+
+Sometimes you need a small dataset (few rows and columns) that you don't already have in a file.
+You can create these directly in R.
+
+### With `readr::read_delim`
+
+Instead of giving `read_delim` the file name of a data file, you can give it a block of text to read directly.
+
+
+```{r readr-textblock}
+svalbard_islands <-  read_delim("island, Latitude, Longitude
+Nordaustlandet, 79.558405, 24.017351
+Prins Karls Forland, 78.554090, 11.256545", delim = ",")
+```
+
+Don't leave any extra space in the text block or it can be included in the output.
+
+### With `tibble::tribble`
+
+Or you can use `tribble()`.
+`tribble` takes the column names preceded by a tilde, and then the data, all separated by commas.
+Anything other than a number need to be enclosed in quotation marks.
+
+
+```{r}
+svalbard_islands <-  tribble( ~ island, ~ Latitude, ~ Longitude,
+   "Nordaustlandet", 79.558405, 24.017351,
+   "Prins Karls Forland", 78.554090, 11.256545)
+```
+
+You don't need to format it so that each row has it's own line but it makes it easier to read.
+
+It is largely a matter of personal preference whether you want to use `read_delim` or `tribble`.
