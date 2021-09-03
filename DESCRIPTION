@@ -19,4 +19,9 @@ Suggests:
     conflicted, 
     lme4
 Imports: 
-    rstudioapi
+    rstudioapi,
+    learnr,
+    rmarkdown,
+    purrr,
+    glue,
+    fs

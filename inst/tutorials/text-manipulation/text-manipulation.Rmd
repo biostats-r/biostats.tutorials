@@ -84,7 +84,7 @@ Perhaps we want to detect everything that starts with an "N", but ignore any oth
 For this type of problem, [regular expressions](https://en.wikipedia.org/wiki/Regular_expression) are a very powerful tool.
 
 Regular expressions (often shortened to regex) are sequences of special metacharacters and literal characters.
-They can be though of as an extension of wildcard for searching. 
+They can be though of as an extension of wildcards for searching. 
 
 ### Literal characters
 
@@ -222,7 +222,8 @@ str_detect(string = diatoms, pattern = "a$")
 ### Escaping metacharacters
 
 If you want to detect a literal "." then there is a problem as "." is a metacharacter. 
-We need to escape metacharacters `{}[]()^$.|*+? and \` with two backslashes to treat them as literals.
+We need to escape the "." with two backslashes so it can be treated as a literal fullstop.
+We also need to escape metacharacters `{}[]()^$.|*+? and \`. 
 
 ```{r escape}
 has_dot <- c("Navicula.elkab", "Navicula radiosa")
@@ -230,8 +231,7 @@ has_dot <- c("Navicula.elkab", "Navicula radiosa")
 str_detect(string = has_dot, pattern = "\\.")
 ```
 
-If we don't want to use any metacharacters as metacharacters, it is easier to use a helper function.
-
+If we don't want to use any metacharacters as metacharacters, it is easier to use a helper function which forces R to treat everything as a literal.
 
 ```{r escape_coll}
 has_dot <- c("Navicula.elkab", "Navicula radiosa")
@@ -256,8 +256,10 @@ Why?
 ### Help from `regexplain`
 
 Writing regular expressions is tricky.
-Fortunately there are Rstudio addins from the [`regexplain` package](https://github.com/gadenbuie/regexplain) that can help you write them.
-You will find these in the addins menu.
+Fortunately there are Rstudio addins from the [`regexplain` package](https://www.garrickadenbuie.com/project/regexplain/) that can help you write them.
+You will find these in the addins menu after you install the package. 
+
+Install it and try it out.
 
 Note that in the `regexplain` addins, the backslashes in the regular expressions are not doubled.
 
@@ -275,11 +277,12 @@ str_replace(diatoms, pattern = "_", replacement = " ")
 
 This will replace the first underscore in each element.
 If there were several underscores and we want to replace them all, we can use `str_replace_all`. 
-If we want to remove some character, we can either use `str_replace` and set `replacement = ""`, or use `str_remove`.
+If we want to remove some characters, we can either use `str_replace` and set `replacement = ""`, or use `str_remove`.
 
 ### Using `str_replace` with `mutate`
 
 We can use `str_replace` on a column in a tibble with a `mutate`
+
 
 ```{r replace-tibble}
 saveRDS(mutate, file = "mutate.RDS")
@@ -339,6 +342,7 @@ str_replace(filenames, pattern = ".*/(\\w*)_\\d{4}\\.xls$", replacement = "\\1")
 #or extract word followed by an "_", then remove "_"
 str_extract(filenames, pattern = "\\w*_") |> 
   str_remove(pattern = "_")
+# more powerful regex solutions are also available
 ```
 
 
@@ -347,7 +351,7 @@ str_extract(filenames, pattern = "\\w*_") |>
 ### Changing case
 
 You can change the case of a character vector with `str_to_upper` and `str_to_lower`. 
-Changing the case can often solve many formatting errors.
+Changing the case can often solve formatting inconsistencies.
 
 ```{r to-lower}
 mess <- c("ponds", "Ponds", "PONDS")
@@ -370,8 +374,6 @@ diatoms <- c("Navicula_elkab",
              "Aulacoseira_granulata") 
 str_to_upper(diatoms)
 ```
-
-
 
 ### Trimming white space
 

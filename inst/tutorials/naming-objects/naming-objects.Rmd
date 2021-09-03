@@ -81,7 +81,7 @@ question_checkbox(
   answer("carrot/cabbage", correct = FALSE, message = "Names can only include letters, numbers, `.` and `_`"),
   answer(".", correct = TRUE, message = "The object `.` will be invisible"),
   answer("spinach_potato", correct = TRUE),
-  answer("kål", correct = TRUE, message = "Names with `æ`, `ø`, or `å` are legal but can cause huge problems with locale. Avoid."),
+  answer("kål", correct = TRUE, message = "Names with `æ`, `ø`, or `å` are legal but can cause problems. Avoid."),
   random_answer_order = TRUE,
   allow_retry = TRUE,
   try_again = "Be sure to select all seven legal names!"
