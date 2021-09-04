@@ -24,11 +24,15 @@ tutorial_options(exercise.cap = "Exercise")
 
 temperature <- read_csv(system.file("extdata/Florida_2020-04-20_2020-04-23_1589018968.csv", package = "biostats.tutorials"))
 
-temperature2 <- temperature %>% 
+temperature2 <- temperature |>
   mutate(
     date_time = paste(Dato, Tid), #combine
     date_time = ymd_hms(date_time)#convert
-    ) 
+    )
+
+date1 <- "28/02/1999"
+
+date2 <- format(lubridate::now(), "%d %B %Y %H:%M")
 ```
 
 ## Date and times
@@ -83,21 +87,23 @@ See `?strptime` for the complete list.
 ### Your turn
 
 Use the `as.Date` (for the date) and `as.POSIXct` (for the datetime) to convert the following to dates or datetimes. 
+
+ - `date1 <-` "`r date1`"
+ - `date2 <-` "`r date2`"
+
 You will need to use the `format` argument to each function and read the `strptime` help.
-If you get an `NA`, the format arguement is not correct.
+If you get an `NA`, the format argument is not correct.
 
 
 ```{r base-dates, exercise = TRUE}
-date1 <- "28/02/1999"
+___(date1, ___ = ___)
 
-date2 <- "July 1 2001 2:14"
+___(date2, ___ = ___)
 ```
 
 ```{r base-dates-solution}
-date1 <- "28/02/1999"
 as.Date(date1, format = "%d/%m/%Y")
 
-date2 <- "July 1 2001 2:14"
 as.POSIXct(date2, format = "%B %d %Y %H:%M")
 ```
 
@@ -263,6 +269,11 @@ dmy("1 januar 2020")
 
 Or use the `locale` argument of `dmy`.
 
+```{r locale, eval = FALSE}
+dmy("1 januar 2020", locale = "nb_NO.utf8")# on ubuntu
+```
+
+
 To see the available locales on your computer, run 
 
 ```{r available-locales, eval = FALSE}
@@ -296,7 +307,7 @@ I want to make a single date-time column.
 To do this I need to combine the data and time columns with `paste`, and then use a `lubridate` function for the conversion. 
 
 ```{r date-time-temperature}
-temperature2 <- temperature %>% 
+temperature2 <- temperature |> 
   mutate(
     date_time = paste(Dato, Tid), #combine
     date_time = ymd_hms(date_time)#convert
@@ -308,7 +319,7 @@ temperature2
 `lubridate` functions `make_date` and `make_datetime` are useful if the year, month, day etc are in different columns.
 
 ```{r make-date}
-tibble(year = 2020, month = 10, day = 3) %>% 
+tibble(year = 2020, month = 10, day = 3) |> 
   mutate(date = make_date(year = year, month = month, day = day))
 ```
 
@@ -321,10 +332,10 @@ For example, to calculate the mean temperature of the afternoon of the 21st Apri
 `between` is a useful helper function here to avoid having to write a more complicated logical condition.
 
 ```{r filter-temperature}
-temperature2 %>% 
+temperature2 |> 
   filter(between(date_time, 
                  left = ymd_hm("2020-04-21 12:00"),
-                 right = ymd_hm("2020-04-21 17:00"))) %>% 
+                 right = ymd_hm("2020-04-21 17:00"))) |> 
   summarise(mean_temp = mean(Lufttemperatur))
 
 ```
@@ -334,12 +345,12 @@ temperature2 %>%
 Filter `temperature2` so that it just includes the mornings.
 
 ```{r filter-exercise, exercise = TRUE}
-temperature2 %>% 
+temperature2 |> 
   
 ```
 
 ```{r filter-exercise-solution}
-temperature2 %>% 
+temperature2 |> 
   filter(hour(date_time) < 12)
 ```
 
@@ -350,9 +361,9 @@ I often want to summarise climate data to calculate mean monthly temperatures.
 We can do an analogous task with the `temperature` dataset to calculate mean hourly temperatures.
 
 ```{r mean-hourly}
-temperature2 %>% 
-  mutate(hour = hour(date_time)) %>% 
-  group_by(hour) %>% 
+temperature2 |> 
+  mutate(hour = hour(date_time)) |> 
+  group_by(hour) |> 
   summarise(mean_temperature = mean(Lufttemperatur))
 ```
 
@@ -362,13 +373,13 @@ temperature2 %>%
 Find the mean temperature of each morning.
 
 ```{r morning-mean, exercise=TRUE}
-temperature2 %>% 
+temperature2 |> 
 ```
 
 ```{r morning-mean-solution}
-temperature2 %>% 
-  filter(hour(date_time) < 12) %>% 
-  group_by(Dato) %>%
+temperature2 |> 
+  filter(hour(date_time) < 12) |> 
+  group_by(Dato) |>
   summarise(morning_mean = mean(Lufttemperatur))
 ```
 

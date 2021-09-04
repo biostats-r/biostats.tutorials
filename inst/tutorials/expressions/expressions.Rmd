@@ -1,0 +1,205 @@
+---
+title: "Mathematical notation for plots"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.height = 1, fig.width = 5)
+library("learnr")
+library("tidyverse")
+theme_set(theme_classic())
+
+tutorial_options(exercise.cap = "Exercise")
+g <- ggplot()
+```
+
+## Introduction
+
+When making a publication ready plot, we often need to use special characters and mathematical notation  for the axes and other labels.
+
+ - $TP~concentration~\mu g~l^{-1}$
+ - $Conductivity~\mu S~cm^{-1}$
+ - $\sqrt{Standardised~residuals}$
+ - $\delta^{15}N$
+ 
+The functions `expression()` and `bquote()` are powerful tools for annotating figures with mathematical notation in R. 
+This functionality is not obvious from their respective help files. 
+`demo(plotmath)` and `?plotmath` shows the huge potential of `expression()`, but do not have many examples relevant to biologists with graphs to label.
+
+Expressions are comprised of symbols. 
+The expression $TP ~ concentration ~\mu g~l^{-1}$ includes the symbols $TP$, $concentration$, $\mu$, $g$, $l$, and $^{-1}$. 
+In this tutorial, you will learn how to generate these symbols and combine them with `expression()`.
+
+The key to getting expressions to work is to start with something simple, test it and edit until it works, then add the next symbol and repeat. 
+This is the approach we are going to use here.
+
+## `expression()`
+
+I’m going to use `expression()` with `labs()`, but the same expressions can be used with some other functions that write text on a plot (including base plots). 
+(but see section on parsing below)
+
+The simplest use of expression is take a symbol that is a single word or number.
+
+```{r}
+g <- ggplot() + #empty plot
+  labs(x = expression(TP))
+g
+```
+
+Notice that `expression()` does not require quote marks. 
+This first example of  `expression()` is entirely pointless except as a starting point for something more complex.
+
+If we want two symbols with a space between them, we need to separate them with a tilde `~`. 
+If we don't want a space, we can separate symbols with `*` (if you actually want a `*`, use `%*%`).
+
+```{r}
+g + labs(x = expression(TP~concentration))
+```
+
+Some symbols have special meanings, for example, to get a Greek letter, write its name in lower case. 
+Capitalise the first letter to get an upper-case Greek letter. 
+If for some reason you want to have "beta" written on your plot, it must be in quotes.
+
+```{r}
+g + labs(x = expression(TP~concentration~mu*g))
+```
+
+Subscript or superscript can be added to a string using `^` and `[]` notation respectively. 
+If you want more than one symbol to be in superscript, you need to enclose them in braces `{}`.
+
+```{r}
+g + labs(x = expression(TP~concentration~mu*g~l^-1))
+```
+
+To start an `expression()` with a superscript (or subscript), put `""` first.
+
+```{r, eval = FALSE}
+g + labs(x = expression(""^14*C~years~BP))
+```
+
+
+
+```{r equations, echo = FALSE, message=FALSE}
+library(kableExtra)
+read_csv('
+What, How, Output         
+"Lower-case Greek letters", "delta", "$\\delta$"
+"Upper-Case Greek Letters", "Delta", "$\\Delta$"
+"Subscript", "CO[2]", "$CO_{2}$"
+"Superscript", "m^{-2}", "$m^{-2}$"
+"Italics", "italic(Navicula)", "_Navicula_"'
+) %>% 
+  kbl(booktabs = TRUE, caption = "Some common notation") %>% 
+  kable_styling(full_width = TRUE)
+```
+
+
+### Your turn
+
+Make the x-axis label read $Area~m^2$.
+
+```{r expression1, exercise=TRUE}
+ggplot() + 
+  labs(x = ___)
+```
+
+```{r expression1-solution}
+ggplot() +
+  labs(x = expression(Area~m^2))
+```
+
+Make the x-axis label read $Flux~g~m^{-2}~yr^{-1}$.
+
+```{r expression2, exercise=TRUE}
+ggplot() + 
+  labs(x = ___)
+```
+
+```{r expression2-solution}
+ggplot() +
+  labs(x = expression(Flux~g~m^-2~yr^-1))
+```
+
+Make the x-axis label read $\delta^{15}N$.
+
+```{r expression3, exercise=TRUE}
+ggplot() + 
+  labs(x = ___)
+```
+
+```{r expression3-solution}
+ggplot() +
+  labs(x = expression(delta^15*N))
+```
+
+Make the x-axis label read _Aulacoseira granulata_ var. _angustissima_.
+
+```{r expression4, exercise=TRUE}
+ggplot() + 
+  labs(x = ___)
+```
+
+```{r expression4-solution}
+ggplot() +
+  labs(x = expression(italic(Aulacoseira~granulata)~var.~italic(angustissima)))
+```
+
+## Parsing
+
+Some functions such as `geom_text()`, `facet_wrap` and `scale_x_discrete` do not accept expressions directly. 
+Instead, they take can take parse a string and convert it to an expression.
+Here is a minimal example that uses parse in three different ways to add sub scripts and superscripts to text, axis labels and facet strips. 
+
+```{r parsed, fig.height = 3, fig.width=4}
+dat <- tibble(x = c("NO[3]^-1", "SO[4]^-2"),
+                  y = c(10, 8)) |> 
+  mutate(x = factor(x))
+
+ggplot(dat, aes(x = x, y = y)) +
+  geom_col() +
+  scale_x_discrete(labels = parse(text = levels(dat$x))) +
+  geom_text(aes(label = x), 
+            parse = TRUE, 
+            nudge_y = 1) + 
+  facet_wrap(~ x, labeller = "label_parsed")
+```
+
+
+
+
+## Including objects
+
+So far so good. But sometimes, we want to include the value of an R-object in the expression.
+
+For example, if we wanted to label a point with its `x` value, this will not work.
+
+```{r, error = TRUE}
+value <- 5
+g + labs(x = expression(expression(x==value))
+```
+
+Fortunately, there is another function, `bquote()`, which will let us do this if we use the helper function `.()` with the object we want to include.
+
+
+```{r}
+x <- 5
+g + labs(x = bquote(x==.(x)))
+g + labs(x = bquote(x==.(x)~mu*g~l^-1))
+
+```
+
+
+### Other tips
+
+- `demo(plotmath)` and `?plotmath` are very useful once you have understood the basics.
+- Some symbols are not defined by `plotmath` can be included using [unicode](http://www.unicode.org/charts/). 
+For example a per mil symbol (‰) - `\u2030` 
+- [LaTeX equations](https://biostats-r.github.io/biostats/rmarkdown/figures-tables-and-equations.html#equations) can be converted to expressions with `latex2exp::TeX`.
+
+
+
+If you understand these examples, you should be able to use the remainder of the functionality demonstrated by `demo(plotmath)` and at `?plotmath`.

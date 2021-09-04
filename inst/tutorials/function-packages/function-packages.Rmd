@@ -14,6 +14,7 @@ css: css/style-tutorial.css
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, rows.print = 3)
 library("learnr")
+data(penguins, package = "palmerpenguins")
 ```
 
 ## Functions
@@ -112,7 +113,7 @@ Packages on github can be installed with the `remotes` package.
 
 ```{r install-github, eval = FALSE}
 install.packages("remotes")
-#ggvegan for ploting ordinations is only on github
+#ggvegan for plotting ordinations is only on github
 remotes::install_github("gavinsimpson/ggvegan")
 ```
 
@@ -145,7 +146,9 @@ This can cause big problems, with difficult to interpret error messages.
 library(palmerpenguins)#load data
 library(dplyr)
 library(MASS) # R will report that select is being masked
-penguins %>% select(species)
+
+penguins |> select(species)
+
 ```
 
 If you have code that worked one day and fails the next with a weird error messages, it might be because of a name conflict. 
@@ -155,29 +158,34 @@ There are three solutions.
 
 ### Loading order
 
-Be careful about the order in which packages are loaded. 
+Be very careful about the order in which packages are loaded. 
 If the example above had loaded `MASS` before `dplyr` the `select` function in `MASS` would have been masked and the code would have worked. 
 This solution can work in a script, but is fragile in interactive sessions when it is easy to load packages in the wrong order.
 
 ### `package::function`
+
 Use the `package::function` notation to specify which package a function comes from. 
 This is safe and can make code easier to understand by showing which packages the functions are from. The code above could be written safely as
 
 ```{r, error = TRUE}
-penguins %>% dplyr::select(species)
+penguins |> dplyr::select(species)
+
 ```
 
 This gets ugly fairly quickly, so is best used with packages that you only need a few functions from once or twice, not functions you need many times.
 
 ### `conflicted` package
 
-The safest solution is to use the [`conflicted` package](https://conflicted.r-lib.org/). The `conflicted` package converts any conflicts between packages into errors. This might seem like a bad idea, but it is much easier to diagnose an error from `conflicted` than the weird error of a masked function.
+The safest solution is to use the [`conflicted` package](https://conflicted.r-lib.org/). 
+The `conflicted` package converts any conflicts between packages into errors.
+This might seem like a bad idea, but it is much easier to diagnose an error from `conflicted` than the weird error of a masked function.
 
 ```{r, error = TRUE}
 library(dplyr)
 library(MASS)
 library(conflicted)
-penguins %>% select(species)
+
+penguins |> select(Species)
 ```
 
 As the error message suggests, we can resolve the error either by using the `package::function` notation, or use the function `conflict_prefer` to say which function we want to use by default.  
@@ -187,7 +195,9 @@ library(dplyr)
 library(MASS)
 library(conflicted)
 conflict_prefer("select", "dplyr")
-penguins %>% select(species)
+
+peguins |> select(Species)
+
 ```
 
 
@@ -248,7 +258,7 @@ The workflow when working with `renv` is:
 
 If you find that you need to run the same code several times, it can be useful to write a function.
 
-To make a function, you need to use the reserved word `function` followed by brackets with zero or more arguments. After the brackets, braces encompas the body of the function.
+To make a function, you need to use the reserved word `function` followed by brackets with zero or more arguments. After the brackets, braces encompass the body of the function.
 
 Here is a function that multiples two numbers together. 
 
@@ -263,4 +273,4 @@ multiply(x = 6, y = 7)
 
 
 Once you have written a function, it can be useful to make your own package. This makes it easy to use in your own analysis and easy to share with other users. 
-Information on how to make a package using the `usethis` and `devtools` packages can be found at [https://r-pkgs.org/whole-game.html](https://r-pkgs.org/whole-game.html). 
+Information on how to make a package using the `usethis` and `devtools` packages can be found in the package writing book or at [https://r-pkgs.org/whole-game.html](https://r-pkgs.org/whole-game.html). 

@@ -15,7 +15,9 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Suggests: 
     tidyverse,
-    conflicted
+    learnr,
+    conflicted, 
+    lme4
 Imports: 
     rstudioapi,
     learnr,
