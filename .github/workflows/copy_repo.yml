@@ -1,9 +1,0 @@
-name: Copy
-on: [push, pull_request]
-uses: andstor/copycat-action@v3
-with:
-  personal_token: ${{ secrets.PERSONAL_TOKEN }}
-  src_path: /.
-  dst_path: /backup/
-  dst_owner: andstor
-  dst_repo_name: copycat-action
