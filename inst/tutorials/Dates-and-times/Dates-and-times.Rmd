@@ -104,7 +104,7 @@ ___(date2, ___ = ___)
 ```{r base-dates-solution}
 as.Date(date1, format = "%d/%m/%Y")
 
-as.POSIXct(date2, format = "%B %d %Y %H:%M")
+as.POSIXct(date2, format = "%d %B %Y %H:%M")
 ```
 
 
