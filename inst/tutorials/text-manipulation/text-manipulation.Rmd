@@ -14,25 +14,28 @@ css: css/style-tutorial.css
 knitr::opts_chunk$set(echo = TRUE, fig.height = 1, fig.width = 5)
 library("learnr")
 library("tidyverse")
-theme_set(theme_classic())
+library("glue")
 
 tutorial_options(exercise.cap = "Exercise")
 ```
 
 ## Text manipulation
 
-In this tutorial, you will learn how to manipulate character (text) vectors with the `stringr` package. 
+In this tutorial, you will learn how to manipulate character (text) vectors with the `stringr` package and some other packages. 
 
-Consider this vector of diatom species names (which could be a column in a `data.frame` or `tibble`)
+Consider this vector of diatom species names (which could be a column in a `data.frame` or `tibble`).
 
 ```{r diatoms}
-diatoms <- c("Navicula_elkab",
-             "Nitzschia_palea",
-             "Aulacoseira_granulata") # a vector
+genera <- c("Navicula", "Nitzschia", "Aulacoseira") # a vector
 ```
 
 Each element in the character vector is known as a string.
-We might want to detect which strings have a particular pattern, or replace, remove or extract part of the text.
+We might want to:
+
+- combine strings
+- detect which strings have a particular pattern
+- replace, remove or extract part of the text.
+
 We can do this with the `stringr` package which is loaded when `tidyverse` is loaded.
 
 ```{r eval = FALSE}
@@ -40,6 +43,40 @@ library("tidyverse")# load stringr, ggplot2, dplyr etc
 ```
 
 This tutorial starts with detecting or replacing fixed patterns and then shows how you can use regular expressions to extract varying patterns.
+
+## Combining strings
+
+We want to combine the diatom genera given above with the diatom species names.
+
+```{r}
+diatom_species <- c("elkab", "palea", "granulata")
+```
+
+We can do this with `str_c` (or `paste` in base R).
+
+```{r str_c}
+str_c(genera, diatom_species, sep = " ")
+```
+
+This can get messy when there are lots of things to combine.
+
+```{r}
+genus <- "Nitschia"
+species <- "microcephala"
+length_min <- 10
+length_max <- 15
+str_c(genus, species, "length", length_min, "-", length_max, "µm", sep = " ")
+```
+
+It might be easier to use the glue `package` which lets you put variables (or other R code) in braces.
+
+```{r}
+library(glue)
+glue("{genus} {species} length {length_min}-{length_max} µm")
+```
+
+
+
 
 ## Detecting a pattern
 
@@ -285,7 +322,6 @@ We can use `str_replace` on a column in a tibble with a `mutate`
 
 
 ```{r replace-tibble}
-saveRDS(mutate, file = "mutate.RDS")
 diatom_df |> 
   mutate(species = str_replace(string = species,
                                pattern = "_", 
@@ -348,9 +384,24 @@ str_extract(filenames, pattern = "\\w*_") |>
 
 ## Some other useful `stringr` function 
 
+### Extract a word
+
+The function `word` can be used to extract a word from a string.
+
+```{r}
+plankton <- c("Discostella stelligera",
+             "Thalassiosira pseudonana",
+             "Stephanodiscus parvus")
+#first word
+word(plankton)
+# second word
+word(plankton, start = 2)
+```
+
+
 ### Changing case
 
-You can change the case of a character vector with `str_to_upper` and `str_to_lower`. 
+You can change the case of a character vector with `str_to_upper`, `str_to_lower` and related functions.
 Changing the case can often solve formatting inconsistencies.
 
 ```{r to-lower}
