@@ -150,7 +150,7 @@ ggplot() +
 
 ## Parsing
 
-Some functions such as `geom_text()`, `facet_wrap` and `scale_x_discrete` do not accept expressions directly. 
+Some functions such as `geom_text()`, `facet_wrap()` and `scale_x_discrete()` do not accept expressions directly. 
 Instead, they take can take parse a string and convert it to an expression.
 Here is a minimal example that uses parse in three different ways to add sub scripts and superscripts to text, axis labels and facet strips. 
 
@@ -165,7 +165,7 @@ ggplot(dat, aes(x = x, y = y)) +
   geom_text(aes(label = x), 
             parse = TRUE, 
             nudge_y = 1) + 
-  facet_wrap(~ x, labeller = "label_parsed")
+  facet_wrap(vars(x), labeller = "label_parsed")
 ```
 
 
@@ -179,7 +179,7 @@ For example, if we wanted to label a point with its `x` value, this will not wor
 
 ```{r, error = TRUE}
 value <- 5
-g + labs(x = expression(expression(x==value))
+g + labs(x = expression(x==value))
 ```
 
 Fortunately, there is another function, `bquote()`, which will let us do this if we use the helper function `.()` with the object we want to include.
@@ -198,6 +198,7 @@ g + labs(x = bquote(x==.(x)~mu*g~l^-1))
 - `demo(plotmath)` and `?plotmath` are very useful once you have understood the basics.
 - Some symbols are not defined by `plotmath` can be included using [unicode](http://www.unicode.org/charts/). 
 For example a per mil symbol (‰) - `\u2030` 
+- non-alphanumeric symbols (e.g. %) may need quoting
 - [LaTeX equations](https://biostats-r.github.io/biostats/rmarkdown/figures-tables-and-equations.html#equations) can be converted to expressions with `latex2exp::TeX`.
 
 
