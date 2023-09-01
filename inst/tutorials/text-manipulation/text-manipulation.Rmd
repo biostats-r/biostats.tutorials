@@ -52,10 +52,11 @@ We want to combine the diatom genera given above with the diatom species names.
 diatom_species <- c("elkab", "palea", "granulata")
 ```
 
-We can do this with `str_c` (or `paste` in base R).
+We can do this with `str_c()` (or `paste()` in base R).
 
 ```{r str_c}
-str_c(genera, diatom_species, sep = " ")
+diatoms <- str_c(genera, diatom_species, sep = " ")
+diatoms
 ```
 
 This can get messy when there are lots of things to combine.
@@ -68,7 +69,7 @@ length_max <- 15
 str_c(genus, species, "length", length_min, "-", length_max, "µm", sep = " ")
 ```
 
-It might be easier to use the glue `package` which lets you put variables (or other R code) in braces.
+It might be easier to use the `glue` package which lets you put variables (or other R code) in braces.
 
 ```{r}
 library(glue)
@@ -80,9 +81,9 @@ glue("{genus} {species} length {length_min}-{length_max} µm")
 
 ## Detecting a pattern
 
-### Using `str_detect`
+### Using `str_detect()`
 
-We might want to detect which of the species are in the genus _Navicula_. We can do this with `str_detect` (the base R equivalent is `grepl`).
+We might want to detect which of the species are in the genus _Navicula_. We can do this with `str_detect()` (the base R equivalent is `grepl()`).
 
 ```{r detect}
 str_detect(string = diatoms, pattern = "Navicula")
@@ -93,7 +94,7 @@ This return a logical vector: `TRUE` where the character vector includes the pat
 
 ### Using `str_detect` with `filter`
 
-If the vector `diatoms` was a column in a `tibble` (or `data.frame`), we can use this test in a `filter` to select rows. 
+If the vector `diatoms` was a column in a `tibble` (or `data.frame`), we can use this test in a `filter()` to select rows. 
 
 ```{r detect-tibble}
 diatom_df <- tibble(species = diatoms, 
@@ -303,22 +304,22 @@ Note that in the `regexplain` addins, the backslashes in the regular expressions
 
 ## Replacing text
 
-### Using `str_replace`
+### Using `str_replace()`
 
 
-We can replace characters in some text using `str_replace`. So to replace the underscore in diatoms with a space, we could use
+We can replace characters in some text using `str_replace()`. So to replace the underscore in diatoms with a space, we could use
 
 ```{r replace}
 str_replace(diatoms, pattern = "_", replacement = " ")
 ```
 
 This will replace the first underscore in each element.
-If there were several underscores and we want to replace them all, we can use `str_replace_all`. 
-If we want to remove some characters, we can either use `str_replace` and set `replacement = ""`, or use `str_remove`.
+If there were several underscores and we want to replace them all, we can use `str_replace_all()`. 
+If we want to remove some characters, we can either use `str_replace()` and set `replacement = ""`, or use `str_remove()`.
 
-### Using `str_replace` with `mutate`
+### Using `str_replace()` with `mutate()`
 
-We can use `str_replace` on a column in a tibble with a `mutate`
+We can use `str_replace()` on a column in a tibble with a `mutate()`
 
 
 ```{r replace-tibble}
@@ -342,7 +343,7 @@ filename <- "c:/pond_2020.xls"
 
 There are two ways to do this.
 
-The first is to use capture groups in `str_replace`.
+The first is to use capture groups in `str_replace()`.
 Capture groups are groups of characters in the pattern surrounded by brackets.
 
 ```{r capture-groups}
@@ -351,18 +352,18 @@ str_replace(filename, pattern = ".*_(\\d{4})\\.xls", replacement = "\\1")
 The pattern `".*_(\\d{4})\\.xls$"` will match strings that have any number of any characters followed by an underscore, followed by four numbers followed by ".xls" which has to be the end of the string because of the `$`.
 The `\\1` in the replacement will return the first (and only) capture group.
 
-### Using `str_extract`
+### Using `str_extract()`
 
-The second solution is the use `str_extract`.
+The second solution is the use `str_extract()`.
 
 ```{r extract}
 str_extract(filename, pattern = "\\d{4}")
 ```
 
 It is usually possible to use either of these methods.
-Here, `str_extract` is easier. 
+Here, `str_extract()` is easier. 
 If there were multiple numeric sequences and we wanted a specific one, then capture groups might be easier.
-One important difference is that if the match fails, `str_extract` will return `NA`, whereas `str_replace` will return the original string.
+One important difference is that if the match fails, `str_extract()` will return `NA`, whereas `str_replace()` will return the original string.
 
 ### Your turn
 
@@ -401,7 +402,7 @@ word(plankton, start = 2)
 
 ### Changing case
 
-You can change the case of a character vector with `str_to_upper`, `str_to_lower` and related functions.
+You can change the case of a character vector with `str_to_upper()`, `str_to_lower()` and related functions.
 Changing the case can often solve formatting inconsistencies.
 
 ```{r to-lower}
@@ -431,7 +432,7 @@ str_to_upper(diatoms)
 One very common problem with raw data is extra spaces. 
 
 "Navicula" is not equal to "Navicula&nbsp;" or " Navicula", but it may be impossible to see the difference. 
-`str_trim` will remove whitespace from the start or end of a string.  
+`str_trim()` will remove whitespace from the start or end of a string.  
 
 ```{r str-trim}
 str_trim(c("Navicula ", " Navicula"))
@@ -440,7 +441,7 @@ str_trim(c("Navicula ", " Navicula"))
 
 ### Wrapping long strings
 
-`str_wrap` puts a line return (`\n`) into long lines of text.
+`str_wrap()` puts a line return (`\n`) into long lines of text.
 This is useful in when making a figure if captions or labels are too long.
 
 ```{r str-wrap}
