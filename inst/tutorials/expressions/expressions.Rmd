@@ -5,6 +5,7 @@ output:
     progressive: true
     allow_skip: true
 runtime: shiny_prerendered
+css: css/style-tutorial.css
 ---
 
 ```{r setup, include=FALSE}
