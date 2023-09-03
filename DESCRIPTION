@@ -8,11 +8,13 @@ Authors@R:
            email = "richard.telford@uib.no",
            comment = c(ORCID = "0000-0001-9826-3076"))
 Description: Biostats tutorials for data handling in R with tidyverse and shiny apps for statstical concepts.
+  Tutorials should appear in the RStudio tutorials tab (usually top right).
+  To get a list of shiny apps, see `?biostats_apps`.
 License: CC BY 4.0
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.3
 Suggests: 
     conflicted, 
     lubridate,
@@ -23,13 +25,11 @@ Imports:
     rmarkdown,
     purrr,
     learnr,
-    glue,
     fs,
     shiny,
     glue,
     ggplot2,
     tibble,
-    purrr,
     dplyr,
     broom,
     shinyWidgets,
