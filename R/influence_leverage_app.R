@@ -17,6 +17,7 @@
 #' @importFrom dplyr summarise bind_rows select recode
 #' @importFrom rlang .data
 #' @export
+#' @describeIn biostats_apps Diagnostic plots of models with outliers, leverage points and influential points
 
 # library(tidyverse)
 # library(broom)

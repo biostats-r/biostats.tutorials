@@ -2,6 +2,7 @@
 
 #' @import shiny
 #' @export
+#' @describeIn biostats_apps Simulation of the effect of publication bias
 
 publication_bias_app <- function() {
   ui <-  fluidPage(
