@@ -323,6 +323,7 @@ We can use `str_replace()` on a column in a tibble with a `mutate()`
 
 
 ```{r replace-tibble}
+#| eval: false
 diatom_df |> 
   mutate(species = str_replace(string = species,
                                pattern = "_", 
