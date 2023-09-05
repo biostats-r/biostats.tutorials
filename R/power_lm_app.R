@@ -2,6 +2,7 @@
 
 #' @import shiny
 #' @export
+#' @describeIn biostats_apps Simulate a power test
 
 power_lm_app <- function() {
   ui <-  fluidPage(
