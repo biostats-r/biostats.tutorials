@@ -1,6 +1,6 @@
 Package: biostats.tutorials
 Title: Apps and tutorials for statistics and data handling in R
-Version: 0.0.0.9001
+Version: 0.0.0.9002
 Authors@R: 
     person(given = "Richard",
            family = "Telford",
@@ -21,7 +21,6 @@ Suggests:
     stringr,
     lme4
 Imports: 
-    rstudioapi,
     rmarkdown,
     purrr,
     learnr,
