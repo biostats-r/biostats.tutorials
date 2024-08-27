@@ -5,6 +5,7 @@ output:
     progressive: true
     allow_skip: true
 runtime: shiny_prerendered
+description: From simple symbols to complex expressions, this tutorial will show you how to use `expression()` and `bquote()` to add mathematical notation to your plots.
 css: css/style-tutorial.css
 ---
 
